@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ring Continuity Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: black;
+            color: white;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        input[type=range] {
+            width: 300px;
+        }
+    </style>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9643713751679948"
+     crossorigin="anonymous"></script>
+  
+</head>
+<body>
+    <h1>Ring Continuity Checker</h1>
+    <p>Expected r2 Reading: <span id="r2">0.00</span> &Omega;</p>
+    <p>Expected R1R2 Value: <span id="r1r2">0.00</span> &Omega;</p>
+    <p>Estimated Cable Length (Copper 2.5mm²): <span id="cableLength">0.00</span> meters</p>
+    
+    <div class="slider-container">
+        <span>r1</span>
+        <span id="r1Value">0.00</span> &Omega;
+        <input type="range" id="r1Slider" min="0" max="2" step="0.01" value="0">
+    </div>
+    
+    <script>
+        const r1Slider = document.getElementById("r1Slider");
+        const r1Value = document.getElementById("r1Value");
+        const r2Display = document.getElementById("r2");
+        const r1r2Display = document.getElementById("r1r2");
+        const cableLengthDisplay = document.getElementById("cableLength");
+
+        function updateValues() {
+            let r1 = parseFloat(r1Slider.value);
+            let r2 = (r1 * 1.67).toFixed(2);
+            let r1r2 = ((r1 + parseFloat(r2)) / 4).toFixed(2);
+            let cableLength = (r1 / 0.00741).toFixed(2); // Approximate conversion for 2.5mm² copper cable
+
+            r1Value.textContent = r1.toFixed(2);
+            r2Display.textContent = r2;
+            r1r2Display.textContent = r1r2;
+            cableLengthDisplay.textContent = cableLength;
+        }
+
+        r1Slider.addEventListener("input", updateValues);
+
+        updateValues();
+    </script>
+</body>
+</html>
