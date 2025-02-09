@@ -25,6 +25,36 @@
 
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9643713751679948"
      crossorigin="anonymous"></script>
+
+
+
+
+
+  <script>
+        const zsValues = {
+            "B": { 6: 5.83, 10: 3.50, 16: 2.19, 20: 1.75, 25: 1.40, 32: 1.10, 40: 0.88, 45: 0.78 },
+            "C": { 6: 2.92, 10: 1.75, 16: 1.10, 20: 0.88, 25: 0.70, 32: 0.55, 40: 0.44, 45: 0.39 },
+            "D": { 6: 1.46, 10: 0.88, 16: 0.55, 20: 0.44, 25: 0.35, 32: 0.28, 40: 0.44, 45: 0.09 }
+        };
+        
+        const ampsValues = [6, 10, 16, 20, 25, 32, 40, 45];
+        
+        function updateZs() {
+            const typeValues = ["B", "C", "D"];
+            const typeIndex = document.getElementById('type').value;
+            const type = typeValues[typeIndex];
+            const ampsIndex = document.getElementById('amps').value;
+            const amps = ampsValues[ampsIndex];
+            const maxZs = zsValues[type][amps] * 1; // Applying 80% factor
+            document.getElementById('result').innerText = `Max Zs (80%): ${maxZs.toFixed(2)} Ω`;
+            document.getElementById('typeValue').innerText = `Type: ${type}`;
+            document.getElementById('ampsValue').innerText = `Amps: ${amps}`;
+        }
+    </script>
+
+
+
+
   
 </head>
 <body>
@@ -62,5 +92,30 @@
 
         updateValues();
     </script>
+
+
+
+
+    <h1></h1>
+
+    
+    <h2 id="result">Max Zs (80%): -- Ω</h2>
+    
+    <label for="type">MCB Type:</label>
+    <input type="range" id="type" min="0" max="2" step="1" value="0" oninput="updateZs()">
+    <span id="typeValue">Type: B</span>
+    
+    <br>
+    
+    <label for="amps">Current Rating (Amps):</label>
+    <input type="range" id="amps" min="0" max="7" step="1" value="0" oninput="updateZs()">
+    <span id="ampsValue">Amps: 6</span>
+    
+    <script>
+        updateZs(); // Initial calculation on load
+    </script>
+
+
+  
 </body>
 </html>
