@@ -106,38 +106,49 @@
         const cableLengthDisplay = document.getElementById("cableLength");
         const cableToggle = document.getElementById("cableToggle");
         const cableSizeDisplay = document.getElementById("cableSize");
+        const typeSlider = document.getElementById("type");
+        const ampsSlider = document.getElementById("amps");
+        const typeValue = document.getElementById("typeValue");
+        const ampsValue = document.getElementById("ampsValue");
+        const resultDisplay = document.getElementById("result");
         
         function updateValues() {
             let r1 = parseFloat(r1Slider.value);
             let r2 = (r1 * multiplier).toFixed(2);
             let r1r2 = ((r1 + parseFloat(r2)) / 4).toFixed(2);
             let cableLength = (r1 / cableResistance).toFixed(2);
-
             r1Value.textContent = r1.toFixed(2);
             r2Display.textContent = r2;
             r1r2Display.textContent = r1r2;
             cableLengthDisplay.textContent = cableLength;
         }
         
+        function updateZs() {
+            const zsValues = { "B": [5.83, 3.50, 2.19, 1.75, 1.40, 1.10, 0.88, 0.78], "C": [2.92, 1.75, 1.10, 0.88, 0.70, 0.55, 0.44, 0.39], "D": [1.46, 0.88, 0.55, 0.44, 0.35, 0.28, 0.44, 0.09] };
+            const types = ["B", "C", "D"];
+            let type = types[typeSlider.value];
+            let amps = [6, 10, 16, 20, 25, 32, 40, 45][ampsSlider.value];
+            let zs = zsValues[type][ampsSlider.value] || 0;
+            resultDisplay.textContent = `Max Zs (80%): ${zs.toFixed(2)} Ω`;
+            typeValue.textContent = `Type: ${type}`;
+            ampsValue.textContent = `Amps: ${amps}`;
+        }
+        
         function toggleCableType() {
             is4mm = !is4mm;
-            if (is4mm) {
-                multiplier = 2.5;
-                cableResistance = 0.00463;
-                cableSizeDisplay.textContent = "4mm²";
-                cableToggle.classList.add("toggle-active");
-            } else {
-                multiplier = 1.67;
-                cableResistance = 0.00741;
-                cableSizeDisplay.textContent = "2.5mm²";
-                cableToggle.classList.remove("toggle-active");
-            }
+            multiplier = is4mm ? 2.5 : 1.67;
+            cableResistance = is4mm ? 0.00463 : 0.00741;
+            cableSizeDisplay.textContent = is4mm ? "4mm²" : "2.5mm²";
+            cableToggle.classList.toggle("toggle-active");
             updateValues();
         }
         
         r1Slider.addEventListener("input", updateValues);
         cableToggle.addEventListener("click", toggleCableType);
+        typeSlider.addEventListener("input", updateZs);
+        ampsSlider.addEventListener("input", updateZs);
         updateValues();
+        updateZs();
     </script>
     
     <div class="divider"></div>
