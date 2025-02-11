@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9643713751679948" crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ring Continuity Checker</title>
@@ -18,19 +19,82 @@
             justify-content: center;
             gap: 10px;
         }
-        input[type=range] {
-            width: 300px;
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .toggle-button {
+            display: inline-block;
+            background-color: #444;
+            border-radius: 15px;
+            width: 60px;
+            height: 30px;
+            position: relative;
+            cursor: pointer;
+        }
+        .toggle-button:before {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background-color: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: 0.3s;
+        }
+        .toggle-active:before {
+            left: 32px;
+        }
+        .divider {
+            margin: 40px auto;
+            width: 80%;
+            height: 2px;
+            background-color: white;
+        }
+        .bold-text {
+            font-weight: bold;
+            font-size: 1.2em;
         }
     </style>
-
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9643713751679948"
-     crossorigin="anonymous"></script>
-
-
-
-
-
-  <script>
+</head>
+<body>
+    <h1>Ring Continuity Checker</h1>
+    
+    <div class="toggle-container">
+        <span>2.5mm²</span>
+        <div id="cableToggle" class="toggle-button"></div>
+        <span>4mm²</span>
+    </div>
+    
+    <p>Expected r2 Reading: <span id="r2" class="bold-text">0.00</span> &Omega;</p>
+    <p>Expected R1R2 Value: <span id="r1r2" class="bold-text">0.00</span> &Omega;</p>
+    <p>Estimated Cable Length (Copper <span id="cableSize">2.5mm²</span>): <span id="cableLength">0.00</span> meters</p>
+    
+    <div class="slider-container">
+        <span class="bold-text">r1</span>
+        <span id="r1Value" class="bold-text">0.00</span> &Omega;
+        <input type="range" id="r1Slider" min="0" max="2" step="0.01" value="0">
+    </div>
+    
+    <div class="divider"></div>
+    
+    <h1>Max Zs Calculator (80%)</h1>
+    <h2 id="result">Max Zs (80%): -- Ω</h2>
+    
+    <label for="type">MCB Type:</label>
+    <input type="range" id="type" min="0" max="2" step="1" value="0" oninput="updateZs()">
+    <span id="typeValue">Type: B</span>
+    
+    <br>
+    
+    <label for="amps">Current Rating (Amps):</label>
+    <input type="range" id="amps" min="0" max="7" step="1" value="0" oninput="updateZs()">
+    <span id="ampsValue">Amps: 6</span>
+    
+    <script>
         const zsValues = {
             "B": { 6: 5.83, 10: 3.50, 16: 2.19, 20: 1.75, 25: 1.40, 32: 1.10, 40: 0.88, 45: 0.78 },
             "C": { 6: 2.92, 10: 1.75, 16: 1.10, 20: 0.88, 25: 0.70, 32: 0.55, 40: 0.44, 45: 0.39 },
@@ -45,77 +109,14 @@
             const type = typeValues[typeIndex];
             const ampsIndex = document.getElementById('amps').value;
             const amps = ampsValues[ampsIndex];
-            const maxZs = zsValues[type][amps] * 1; // Applying 80% factor
+            const maxZs = zsValues[type][amps] * 1;
             document.getElementById('result').innerText = `Max Zs (80%): ${maxZs.toFixed(2)} Ω`;
             document.getElementById('typeValue').innerText = `Type: ${type}`;
             document.getElementById('ampsValue').innerText = `Amps: ${amps}`;
         }
+        updateZs();
     </script>
-
-
-
-
-  
-</head>
-<body>
-    <h1>Ring Continuity Checker</h1>
-    <p>Expected r2 Reading: <span id="r2">0.00</span> &Omega;</p>
-    <p>Expected R1R2 Value: <span id="r1r2">0.00</span> &Omega;</p>
-    <p>Estimated Cable Length (Copper 2.5mm²): <span id="cableLength">0.00</span> meters</p>
     
-    <div class="slider-container">
-        <span>r1</span>
-        <span id="r1Value">0.00</span> &Omega;
-        <input type="range" id="r1Slider" min="0" max="2" step="0.01" value="0">
-    </div>
-    
-    <script>
-        const r1Slider = document.getElementById("r1Slider");
-        const r1Value = document.getElementById("r1Value");
-        const r2Display = document.getElementById("r2");
-        const r1r2Display = document.getElementById("r1r2");
-        const cableLengthDisplay = document.getElementById("cableLength");
-
-        function updateValues() {
-            let r1 = parseFloat(r1Slider.value);
-            let r2 = (r1 * 1.67).toFixed(2);
-            let r1r2 = ((r1 + parseFloat(r2)) / 4).toFixed(2);
-            let cableLength = (r1 / 0.00741).toFixed(2); // Approximate conversion for 2.5mm² copper cable
-
-            r1Value.textContent = r1.toFixed(2);
-            r2Display.textContent = r2;
-            r1r2Display.textContent = r1r2;
-            cableLengthDisplay.textContent = cableLength;
-        }
-
-        r1Slider.addEventListener("input", updateValues);
-
-        updateValues();
-    </script>
-
-
-
-
-    <h1></h1>
-
-    
-    <h2 id="result">Max Zs (80%): -- Ω</h2>
-    
-    <label for="type">MCB Type:</label>
-    <input type="range" id="type" min="0" max="2" step="1" value="0" oninput="updateZs()">
-    <span id="typeValue">Type: B</span>
-    
-    <br>
-    
-    <label for="amps">Current Rating (Amps):</label>
-    <input type="range" id="amps" min="0" max="7" step="1" value="0" oninput="updateZs()">
-    <span id="ampsValue">Amps: 6</span>
-    
-    <script>
-        updateZs(); // Initial calculation on load
-    </script>
-
-
-  
+    <div class="divider"></div>
 </body>
 </html>
