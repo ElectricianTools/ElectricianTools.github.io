@@ -114,6 +114,23 @@
             document.getElementById('typeValue').innerText = `Type: ${type}`;
             document.getElementById('ampsValue').innerText = `Amps: ${amps}`;
         }
+
+        const cableToggle = document.getElementById("cableToggle");
+        const cableSizeDisplay = document.getElementById("cableSize");
+        let is4mm = false;
+
+        function toggleCableType() {
+            is4mm = !is4mm;
+            if (is4mm) {
+                cableSizeDisplay.textContent = "4mm²";
+                cableToggle.classList.add("toggle-active");
+            } else {
+                cableSizeDisplay.textContent = "2.5mm²";
+                cableToggle.classList.remove("toggle-active");
+            }
+        }
+
+        cableToggle.addEventListener("click", toggleCableType);
         updateZs();
     </script>
     
