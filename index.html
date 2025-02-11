@@ -4,7 +4,7 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9643713751679948" crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ring Continuity Checker</title>
+    <title>Electrician Tools</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -95,43 +95,49 @@
     <span id="ampsValue">Amps: 6</span>
     
     <script>
-        const zsValues = {
-            "B": { 6: 5.83, 10: 3.50, 16: 2.19, 20: 1.75, 25: 1.40, 32: 1.10, 40: 0.88, 45: 0.78 },
-            "C": { 6: 2.92, 10: 1.75, 16: 1.10, 20: 0.88, 25: 0.70, 32: 0.55, 40: 0.44, 45: 0.39 },
-            "D": { 6: 1.46, 10: 0.88, 16: 0.55, 20: 0.44, 25: 0.35, 32: 0.28, 40: 0.44, 45: 0.09 }
-        };
+        let multiplier = 1.67;
+        let cableResistance = 0.00741;
+        let is4mm = false;
         
-        const ampsValues = [6, 10, 16, 20, 25, 32, 40, 45];
-        
-        function updateZs() {
-            const typeValues = ["B", "C", "D"];
-            const typeIndex = document.getElementById('type').value;
-            const type = typeValues[typeIndex];
-            const ampsIndex = document.getElementById('amps').value;
-            const amps = ampsValues[ampsIndex];
-            const maxZs = zsValues[type][amps] * 1;
-            document.getElementById('result').innerText = `Max Zs (80%): ${maxZs.toFixed(2)} Ω`;
-            document.getElementById('typeValue').innerText = `Type: ${type}`;
-            document.getElementById('ampsValue').innerText = `Amps: ${amps}`;
-        }
-
+        const r1Slider = document.getElementById("r1Slider");
+        const r1Value = document.getElementById("r1Value");
+        const r2Display = document.getElementById("r2");
+        const r1r2Display = document.getElementById("r1r2");
+        const cableLengthDisplay = document.getElementById("cableLength");
         const cableToggle = document.getElementById("cableToggle");
         const cableSizeDisplay = document.getElementById("cableSize");
-        let is4mm = false;
+        
+        function updateValues() {
+            let r1 = parseFloat(r1Slider.value);
+            let r2 = (r1 * multiplier).toFixed(2);
+            let r1r2 = ((r1 + parseFloat(r2)) / 4).toFixed(2);
+            let cableLength = (r1 / cableResistance).toFixed(2);
 
+            r1Value.textContent = r1.toFixed(2);
+            r2Display.textContent = r2;
+            r1r2Display.textContent = r1r2;
+            cableLengthDisplay.textContent = cableLength;
+        }
+        
         function toggleCableType() {
             is4mm = !is4mm;
             if (is4mm) {
+                multiplier = 2.5;
+                cableResistance = 0.00463;
                 cableSizeDisplay.textContent = "4mm²";
                 cableToggle.classList.add("toggle-active");
             } else {
+                multiplier = 1.67;
+                cableResistance = 0.00741;
                 cableSizeDisplay.textContent = "2.5mm²";
                 cableToggle.classList.remove("toggle-active");
             }
+            updateValues();
         }
-
+        
+        r1Slider.addEventListener("input", updateValues);
         cableToggle.addEventListener("click", toggleCableType);
-        updateZs();
+        updateValues();
     </script>
     
     <div class="divider"></div>
