@@ -5,30 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>7-Day Hours Tracker</title>
 <style>
+  /* Styles are unchanged */
   .warning { color: red; font-weight: bold; }
-  body {
-  transition: background-color 0.5s ease, color 0.5s ease; font-family: Arial, sans-serif; padding: 20px; margin: 0; display: flex; flex-direction: column; align-items: center; background-color: #ffffff; }
+  body { transition: background-color 0.5s ease, color 0.5s ease; font-family: Arial, sans-serif; padding: 20px; margin: 0; display: flex; flex-direction: column; align-items: center; background-color: #ffffff; }
   h1 { text-align: center; margin-bottom: 20px; }
-  .container {
-  transition: background-color 0.5s ease, color 0.5s ease; display: flex; flex-direction: column; align-items: center; background-color: #f0f0f0; border: 2px solid #f0f0f0; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; }
+  .container { transition: background-color 0.5s ease, color 0.5s ease; display: flex; flex-direction: column; align-items: center; background-color: #f0f0f0; border: 2px solid #f0f0f0; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; }
   .left-panel, .right-panel { width: 100%; }
   .day-entry { width: 95%; border-radius: 10px; margin-bottom: 6px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; }
   .today { background-color: #ffffcc !important; border: 2px solid #ffcc00; }
   .past { background-color: #e0f7ff; border: 2px solid #3399cc; }
   .future { background-color: #e0ffe0; border: 2px solid #339966; }
-  .day-label {
-    font-weight: bold;
-    display: inline-block;
-    width: 140px;
-    text-align: left;
-    white-space: nowrap;
-    color: #000000;
-  }
+  .day-label { font-weight: bold; display: inline-block; width: 140px; text-align: left; white-space: nowrap; color: #000000; }
   input[type="number"] { width: 60px; padding: 2px; font-size: 1em; margin-left: 4px; }
   #slider-container { display: flex; flex-direction: column; gap: 6px; align-items: center; justify-content: center; height: auto; }
   #dayRange { transform: none; height: auto; width: 100%; max-width: 300px; }
-  button#reset-btn, button#flip-btn {
-  transition: background-color 0.5s ease, color 0.5s ease; margin-top: 10px; padding: 6px 12px; font-size: 1em; border: none; border-radius: 6px; background-color: #007acc; color: white; cursor: pointer; width: 48%; }
+  button#reset-btn, button#flip-btn { transition: background-color 0.5s ease, color 0.5s ease; margin-top: 10px; padding: 6px 12px; font-size: 1em; border: none; border-radius: 6px; background-color: #007acc; color: white; cursor: pointer; width: 48%; }
   button#reset-btn:hover, button#flip-btn:hover { background-color: #005fa3; }
   .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
   .switch input { opacity: 0; width: 0; height: 0; }
@@ -61,22 +52,22 @@
     <form id="hours-form">
       <div id="days-container" style="width: 100%;"></div>
       <div style="margin-top: 10px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 30px;">
-  <div style="display: flex; align-items: center; gap: 8px;">
-    <span>65 Hours</span>
-    <label class="switch">
-      <input type="checkbox" id="hourToggle">
-      <span class="slider round"></span>
-    </label>
-    <span>55 Hours</span>
-  </div>
-  <div style="display: flex; align-items: center; gap: 8px;">
-    <label class="switch">
-      <input type="checkbox" id="darkModeToggle">
-      <span class="slider round"></span>
-    </label>
-    <span>Dark Mode</span>
-  </div>
-</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>65 Hours</span>
+          <label class="switch">
+            <input type="checkbox" id="hourToggle">
+            <span class="slider round"></span>
+          </label>
+          <span>55 Hours</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label class="switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="slider round"></span>
+          </label>
+          <span>Dark Mode</span>
+        </div>
+      </div>
       <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
         <button type="button" id="reset-btn">Reset Hours</button>
         <button type="button" id="flip-btn">Flip Week</button>
@@ -92,8 +83,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalDisplay = document.getElementById('total-display');
   const warningMessage = document.getElementById('warning-message');
   const dayRangeSlider = document.getElementById('dayRange');
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  const hourToggle = document.getElementById('hourToggle');
+  const resetBtn = document.getElementById('reset-btn');
+  const flipBtn = document.getElementById('flip-btn');
   const today = new Date();
   let dateList = [];
+
+  if (!daysContainer || !totalDisplay || !warningMessage || !dayRangeSlider || !darkModeToggle || !hourToggle || !resetBtn || !flipBtn) {
+    console.error('One or more required elements are missing from the page.');
+    return;
+  }
 
   function getDefaultHoursByDate(indexInRange, weekdayNum) {
     const isSecondHalf = indexInRange >= 4;
@@ -103,10 +103,19 @@ document.addEventListener('DOMContentLoaded', () => {
     return useFutureLogic ? 4 : 8;
   }
 
+  function applyDarkModeSetting() {
+    const darkModeEnabled = localStorage.getItem('darkMode') === 'true';
+    if (darkModeEnabled) {
+      document.body.classList.add('dark-mode');
+      document.querySelector('.container').classList.add('dark-mode');
+      document.querySelectorAll('#reset-btn, #flip-btn').forEach(e => e.classList.add('dark-mode'));
+      darkModeToggle.checked = true;
+    }
+  }
+
   function renderDays(offset = 0) {
     daysContainer.innerHTML = '';
     dateList = [];
-
     for (let i = -6 + offset; i <= offset; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
@@ -121,27 +130,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const isPast = date < today;
       const isFuture = date > today;
       const weekdayNum = date.getDay();
-
       let stored = localStorage.getItem(dateStr);
       if (stored === null || stored === '') {
         stored = getDefaultHoursByDate(i + 6 - offset, weekdayNum);
         localStorage.setItem(dateStr, stored);
       }
-
       const container = document.createElement('div');
       container.className = 'day-entry';
       if (isToday) container.classList.add('today');
       else if (isPast) container.classList.add('past');
       else container.classList.add('future');
-
-      container.innerHTML = `
-        <label class="day-label" for="${dateStr}">${formattedDate}:</label>
-        <input type="number" id="${dateStr}" name="${dateStr}" step="0.25" value="${stored}">
-      `;
+      container.innerHTML = `<label class="day-label" for="${dateStr}">${formattedDate}:</label><input type="number" id="${dateStr}" name="${dateStr}" step="0.25" value="${stored}">`;
       daysContainer.appendChild(container);
       dateList.push(dateStr);
     }
-
     dateList.forEach(date => {
       const input = document.getElementById(date);
       input.addEventListener('input', function () {
@@ -149,7 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
         calculateTotal();
       });
     });
-
     calculateTotal();
   }
 
@@ -169,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     warningMessage.className = estimatedTotal > maxHours ? "warning" : "";
   }
 
-  document.getElementById('hourToggle').addEventListener('change', function () {
+  hourToggle.addEventListener('change', function () {
     maxHours = this.checked ? 55 : 65;
     calculateTotal();
   });
@@ -179,23 +180,25 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDays(offset);
   });
 
-  document.getElementById('reset-btn').addEventListener('click', function () {
+  resetBtn.addEventListener('click', function () {
     localStorage.clear();
     renderDays(parseInt(dayRangeSlider.value));
   });
 
-  document.getElementById('flip-btn').addEventListener('click', function () {
+  flipBtn.addEventListener('click', function () {
     flipped = !flipped;
     localStorage.clear();
     renderDays(parseInt(dayRangeSlider.value));
   });
 
-  document.getElementById('darkModeToggle').addEventListener('change', function () {
-    document.body.classList.toggle('dark-mode');
+  darkModeToggle.addEventListener('change', function () {
+    const isDark = document.body.classList.toggle('dark-mode');
     document.querySelector('.container').classList.toggle('dark-mode');
     document.querySelectorAll('#reset-btn, #flip-btn').forEach(e => e.classList.toggle('dark-mode'));
+    localStorage.setItem('darkMode', isDark);
   });
 
+  applyDarkModeSetting();
   renderDays(0);
 });
 </script>
