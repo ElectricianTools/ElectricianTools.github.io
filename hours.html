@@ -209,7 +209,40 @@
       }
       lastClick = now;
     });
-  </script>
+  
+
+    // Add touch support
+    selector.addEventListener('touchstart', () => mouseDown = true);
+    selector.addEventListener('touchend', () => mouseDown = false);
+
+    document.querySelectorAll('.block').forEach(block => {
+      const inner = block.querySelector('.block-inner');
+
+      const applyColor = () => {
+        inner.className = 'block-inner';
+        if (selectedColor !== 'none') {
+          inner.classList.add(selectedColor);
+        }
+      };
+
+      block.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        applyColor();
+      }, { passive: false });
+
+      block.addEventListener('touchmove', (e) => {
+        const touch = e.touches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target && target.classList.contains('block-inner')) {
+          target.className = 'block-inner';
+          if (selectedColor !== 'none') {
+            target.classList.add(selectedColor);
+          }
+        }
+      }, { passive: false });
+    });
+
+</script>
 
 </body>
 </html>
