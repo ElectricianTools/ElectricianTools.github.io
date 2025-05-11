@@ -59,11 +59,12 @@
       transform: translate(-50%, -50%);
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      grid-gap: 10px;
-      margin-top: 20px;
+    
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
     }
 
     .hour-block {
@@ -112,30 +113,37 @@
     .color-2 { background: #4da6ff; }
     .color-3 { background: #4dff88; }
     .color-4 { background: #ffd24d; }
-  </style>
+    .color-5 { background: #003366; }
+  
+    
+</style>
 </head>
 <body>
 
   <h1>24-Hour 15-Minute Selector</h1>
 
   <div class="color-picker">
-  <div style="display: flex; flex-direction: column; align-items: center;">
-    <button class="color-button color-2" data-color="color-2"></button>
-    <span style="font-size: 12px; margin-top: 4px;">Standard</span>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <button class="color-button color-2" data-color="color-2"></button>
+      <span style="font-size: 12px; margin-top: 4px;">Standard</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <button class="color-button" style="background: #003366;" data-color="color-5"></button>
+      <span style="font-size: 12px; margin-top: 4px;">Overtime</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <button class="color-button color-3" data-color="color-3"></button>
+      <span style="font-size: 12px; margin-top: 4px;">Rota A</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <button class="color-button color-4" data-color="color-4"></button>
+      <span style="font-size: 12px; margin-top: 4px;">Rota D</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <button class="color-button clear-button" data-color="none"></button>
+      <span style="font-size: 12px; margin-top: 4px;">Clear</span>
+    </div>
   </div>
-  <div style="display: flex; flex-direction: column; align-items: center;">
-    <button class="color-button color-3" data-color="color-3"></button>
-    <span style="font-size: 12px; margin-top: 4px;">Rota A</span>
-  </div>
-  <div style="display: flex; flex-direction: column; align-items: center;">
-    <button class="color-button color-4" data-color="color-4"></button>
-    <span style="font-size: 12px; margin-top: 4px;">Rota D</span>
-  </div>
-  <div style="display: flex; flex-direction: column; align-items: center;">
-    <button class="color-button clear-button" data-color="none"></button>
-    <span style="font-size: 12px; margin-top: 4px;">Clear</span>
-  </div>
-</div>
 
   <div id="selector" class="grid"></div>
 
@@ -209,7 +217,6 @@
       }
       lastClick = now;
     });
-  
 
     // Add touch support
     selector.addEventListener('touchstart', () => mouseDown = true);
@@ -241,8 +248,7 @@
         }
       }, { passive: false });
     });
-
-</script>
+  </script>
 
 </body>
 </html>
