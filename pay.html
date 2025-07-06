@@ -190,7 +190,6 @@
       <div>Rota A Segments: <span id="rota-a-segs">0</span></div>
       <div>Rota D Segments: <span id="rota-d-segs">0</span></div>
     </div>
-    </div>
   </div>
 
   <script>
@@ -223,21 +222,6 @@
           inner.className = 'block-inner';
         }
         updateTotal();
-
-      // Load saved rates from memory
-      const savedRates = window.payRates || {};
-      if (savedRates.standard) document.getElementById('rate-standard').value = savedRates.standard;
-      if (savedRates.rotaA) document.getElementById('rate-rota-a').value = savedRates.rotaA;
-      if (savedRates.rotaD) document.getElementById('rate-rota-d').value = savedRates.rotaD;
-
-      // Function to save rates to memory
-      function saveRates() {
-        window.payRates = {
-          standard: document.getElementById('rate-standard').value,
-          rotaA: document.getElementById('rate-rota-a').value,
-          rotaD: document.getElementById('rate-rota-d').value
-        };
-      }
       };
 
       for (let row = 0; row < 4; row++) {
@@ -291,7 +275,6 @@
           selector.appendChild(hourBlock);
         }
       }
-      updateTotal();
 
       // Update total earnings
       function updateTotal() {
@@ -305,25 +288,27 @@
 
         blocks.forEach((block, idx) => {
           const hourIndex = idx;
-          const isPaidBlock = block.classList.contains('color-2') || block.classList.contains('color-3') || block.classList.contains('color-4') || block.classList.contains('color-5');
           
-          if (isPaidBlock) {
-            // All paid blocks get time multipliers based on time periods
-            if (hourIndex >= 62 && hourIndex < 88) {
+          // All paid blocks get time multipliers based on time period
+          if (block.classList.contains('color-2') || block.classList.contains('color-3') || block.classList.contains('color-4') || block.classList.contains('color-5')) {
+            if (hourIndex >= 62 && hourIndex <= 95) {
+              // 15:30-00:00 is time and a half (includes 22:00-23:59)
               timeHalf++;
-            } else if (hourIndex >= 88 || hourIndex < 30) {
+            } else if (hourIndex >= 0 && hourIndex < 30) {
+              // 00:00-07:30 is double time
               double++;
             } else {
+              // 07:30-15:30 is standard time
               std++;
             }
-            
-            // Track overtime blocks separately (but don't double count in time periods)
-            if (block.classList.contains('color-5')) {
-              overtime++;
-            }
+          }
+          
+          // Track overtime blocks separately for display only
+          if (block.classList.contains('color-5')) {
+            overtime++;
           }
 
-          // Track rota segments (these get flat fees, not hourly)
+          // Track rota segments for flat fees
           if (block.classList.contains('color-3')) rotaAIndices.push(idx);
           if (block.classList.contains('color-4')) rotaDIndices.push(idx);
         });
@@ -352,8 +337,8 @@
         const doubleHours = double / 4;
         const overtimeHours = overtime / 4;
 
+        // Calculate pay - overtime is included in time period totals
         const pay = (stdHours * rateStandard) +
-                    (overtimeHours * rateStandard) +
                     (timeHalfHours * rateStandard * 1.5) +
                     (doubleHours * rateStandard * 2) +
                     rotaASegs * feeRotaA +
@@ -366,6 +351,23 @@
         document.getElementById('rota-a-segs').textContent = rotaASegs;
         document.getElementById('rota-d-segs').textContent = rotaDSegs;
         document.getElementById('overtime-hours').textContent = overtimeHours.toFixed(2);
+      }
+
+      updateTotal();
+
+      // Load saved rates from memory
+      const savedRates = window.payRates || {};
+      if (savedRates.standard) document.getElementById('rate-standard').value = savedRates.standard;
+      if (savedRates.rotaA) document.getElementById('rate-rota-a').value = savedRates.rotaA;
+      if (savedRates.rotaD) document.getElementById('rate-rota-d').value = savedRates.rotaD;
+
+      // Function to save rates to memory
+      function saveRates() {
+        window.payRates = {
+          standard: document.getElementById('rate-standard').value,
+          rotaA: document.getElementById('rate-rota-a').value,
+          rotaD: document.getElementById('rate-rota-d').value
+        };
       }
 
       let lastClick = 0;
