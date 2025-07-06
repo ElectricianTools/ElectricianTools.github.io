@@ -151,20 +151,32 @@
 
   <div id="bottom-section" style="background:#2a2a2a; margin-top: 30px; padding: 20px; border-radius: 12px; max-width: 1000px; margin-left: auto; margin-right: auto; box-sizing: border-box;">
     <div style="margin-bottom: 15px; text-align: left; color: #aaa;">
-      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-        <strong style="font-size: 32px; min-width: 80px;">Total:</strong>
-        <input id="total-made" type="text" readonly style="background:#2a2a2a;color:#ccc;font-size:24px;border:1px solid #2a2a2a;border-radius:4px;padding:5px;flex-grow:1;min-width:0;max-width:200px;" value="£0.00">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <strong style="font-size: 32px; min-width: 80px;">Total:</strong>
+          <input id="total-made" type="text" readonly style="background:#2a2a2a;color:#ccc;font-size:32px;border:1px solid #2a2a2a;border-radius:4px;padding:5px;width:8ch;min-width:8ch;max-width:8ch;" value="£0.00">
+        </div>
+        <button id="settings-toggle" style="background:none;border:none;color:#aaa;font-size:32px;cursor:pointer;padding:8px;border-radius:4px;transition:color 0.2s;" title="Settings">⚙</button>
       </div>
     </div>
-    <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+    <div id="settings-section" style="display: none; justify-content: space-between; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
       <label style="flex: 1; text-align: left; color: #aaa; min-width: 120px;">Standard (£/hr):
-        <input id="rate-standard" type="text" value="20" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px;width:100%;box-sizing:border-box;">
+        <div style="position: relative;">
+          <span style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); color: #ccc;">£</span>
+          <input id="rate-standard" type="text" value="20" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px 5px 5px 20px;width:100%;box-sizing:border-box;">
+        </div>
       </label>
       <label style="flex: 1; text-align: left; color: #aaa; min-width: 120px;">Rota A Fee (£):
-        <input id="rate-rota-a" type="text" value="30" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px;width:100%;box-sizing:border-box;">
+        <div style="position: relative;">
+          <span style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); color: #ccc;">£</span>
+          <input id="rate-rota-a" type="text" value="30" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px 5px 5px 20px;width:100%;box-sizing:border-box;">
+        </div>
       </label>
       <label style="flex: 1; text-align: left; color: #aaa; min-width: 120px;">Rota D Fee (£):
-        <input id="rate-rota-d" type="text" value="40" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px;width:100%;box-sizing:border-box;">
+        <div style="position: relative;">
+          <span style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); color: #ccc;">£</span>
+          <input id="rate-rota-d" type="text" value="40" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px 5px 5px 20px;width:100%;box-sizing:border-box;">
+        </div>
       </label>
     </div>
     <div style="text-align: left; color: #aaa; font-size: 14px; margin-top: 20px;">
@@ -354,6 +366,25 @@
         }
         lastClick = now;
       });
+
+      // Settings toggle functionality
+      const settingsToggle = document.getElementById('settings-toggle');
+      const settingsSection = document.getElementById('settings-section');
+      
+      settingsToggle.addEventListener('click', () => {
+        if (settingsSection.style.display === 'none') {
+          settingsSection.style.display = 'flex';
+          settingsToggle.style.color = '#ccc';
+        } else {
+          settingsSection.style.display = 'none';
+          settingsToggle.style.color = '#aaa';
+        }
+      });
+
+      // Update total when settings change
+      document.getElementById('rate-standard').addEventListener('input', updateTotal);
+      document.getElementById('rate-rota-a').addEventListener('input', updateTotal);
+      document.getElementById('rate-rota-d').addEventListener('input', updateTotal);
     });
   </script>
 </body>
