@@ -172,7 +172,7 @@
       <label style="flex: 1; text-align: left; color: #aaa; min-width: 120px;">Rota A Fee (£):
         <div style="position: relative; max-width: 80px;">
           <span style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); color: #ccc;">£</span>
-          <input id="rate-rota-a" type="text" value="30.97" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px 5px 5px 20px;width:100%;box-sizing:border-box;">
+          <input id="rate-rota-a" type="text" value="22.33" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px 5px 5px 20px;width:100%;box-sizing:border-box;">
         </div>
       </label>
       <label style="flex: 1; text-align: left; color: #aaa; min-width: 120px;">Rota D Fee (£):
@@ -308,26 +308,22 @@
           const isPaidBlock = block.classList.contains('color-2') || block.classList.contains('color-3') || block.classList.contains('color-4') || block.classList.contains('color-5');
           
           if (isPaidBlock) {
-            // All paid blocks (including overtime) get time multipliers based on time periods
+            // All paid blocks get time multipliers based on time periods
             if (hourIndex >= 62 && hourIndex < 88) {
-              if (block.classList.contains('color-5')) {
-                overtime++; // Track overtime blocks separately
-              }
               timeHalf++;
             } else if (hourIndex >= 88 || hourIndex < 30) {
-              if (block.classList.contains('color-5')) {
-                overtime++; // Track overtime blocks separately
-              }
               double++;
             } else {
-              if (block.classList.contains('color-5')) {
-                overtime++; // Track overtime blocks separately
-              }
               std++;
+            }
+            
+            // Track overtime blocks separately (but don't double count in time periods)
+            if (block.classList.contains('color-5')) {
+              overtime++;
             }
           }
 
-          // Track rota segments
+          // Track rota segments (these get flat fees, not hourly)
           if (block.classList.contains('color-3')) rotaAIndices.push(idx);
           if (block.classList.contains('color-4')) rotaDIndices.push(idx);
         });
