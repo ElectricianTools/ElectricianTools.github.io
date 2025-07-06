@@ -166,19 +166,19 @@
       <label style="flex: 1; text-align: left; color: #aaa; min-width: 120px;">Standard (£/hr):
         <div style="position: relative; max-width: 80px;">
           <span style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); color: #ccc;">£</span>
-          <input id="rate-standard" type="text" value="20" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px 5px 5px 20px;width:100%;box-sizing:border-box;">
+          <input id="rate-standard" type="text" value="20.65" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px 5px 5px 20px;width:100%;box-sizing:border-box;">
         </div>
       </label>
       <label style="flex: 1; text-align: left; color: #aaa; min-width: 120px;">Rota A Fee (£):
         <div style="position: relative; max-width: 80px;">
           <span style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); color: #ccc;">£</span>
-          <input id="rate-rota-a" type="text" value="30" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px 5px 5px 20px;width:100%;box-sizing:border-box;">
+          <input id="rate-rota-a" type="text" value="30.97" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px 5px 5px 20px;width:100%;box-sizing:border-box;">
         </div>
       </label>
       <label style="flex: 1; text-align: left; color: #aaa; min-width: 120px;">Rota D Fee (£):
         <div style="position: relative; max-width: 80px;">
           <span style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); color: #ccc;">£</span>
-          <input id="rate-rota-d" type="text" value="40" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px 5px 5px 20px;width:100%;box-sizing:border-box;">
+          <input id="rate-rota-d" type="text" value="69.67" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px 5px 5px 20px;width:100%;box-sizing:border-box;">
         </div>
       </label>
     </div>
@@ -223,6 +223,21 @@
           inner.className = 'block-inner';
         }
         updateTotal();
+
+      // Load saved rates from memory
+      const savedRates = window.payRates || {};
+      if (savedRates.standard) document.getElementById('rate-standard').value = savedRates.standard;
+      if (savedRates.rotaA) document.getElementById('rate-rota-a').value = savedRates.rotaA;
+      if (savedRates.rotaD) document.getElementById('rate-rota-d').value = savedRates.rotaD;
+
+      // Function to save rates to memory
+      function saveRates() {
+        window.payRates = {
+          standard: document.getElementById('rate-standard').value,
+          rotaA: document.getElementById('rate-rota-a').value,
+          rotaD: document.getElementById('rate-rota-d').value
+        };
+      }
       };
 
       for (let row = 0; row < 4; row++) {
@@ -385,9 +400,18 @@
       });
 
       // Update total when settings change
-      document.getElementById('rate-standard').addEventListener('input', updateTotal);
-      document.getElementById('rate-rota-a').addEventListener('input', updateTotal);
-      document.getElementById('rate-rota-d').addEventListener('input', updateTotal);
+      document.getElementById('rate-standard').addEventListener('input', () => {
+        updateTotal();
+        saveRates();
+      });
+      document.getElementById('rate-rota-a').addEventListener('input', () => {
+        updateTotal();
+        saveRates();
+      });
+      document.getElementById('rate-rota-d').addEventListener('input', () => {
+        updateTotal();
+        saveRates();
+      });
     });
   </script>
 </body>
