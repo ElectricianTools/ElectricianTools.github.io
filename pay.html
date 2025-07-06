@@ -149,22 +149,22 @@
   </div>
   <div id="selector" class="grid"></div>
 
-  <div id="bottom-section" style="background:#2a2a2a; margin-top: 30px; padding: 20px; border-radius: 12px; max-width: 1000px; margin-left: auto; margin-right: auto;">
+  <div id="bottom-section" style="background:#2a2a2a; margin-top: 30px; padding: 20px; border-radius: 12px; max-width: 1000px; margin-left: auto; margin-right: auto; box-sizing: border-box;">
     <div style="margin-bottom: 15px; text-align: left; color: #aaa;">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <strong style="font-size: 32px;">Total:</strong>
-        <input id="total-made" type="text" readonly style="background:#2a2a2a;color:#ccc;font-size:32px;border:1px solid #2a2a2a;border-radius:4px;padding:5px;flex-grow:1;" value="£0.00">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <strong style="font-size: 32px; min-width: 80px;">Total:</strong>
+        <input id="total-made" type="text" readonly style="background:#2a2a2a;color:#ccc;font-size:24px;border:1px solid #2a2a2a;border-radius:4px;padding:5px;flex-grow:1;min-width:0;max-width:200px;" value="£0.00">
       </div>
     </div>
-    <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px;">
-      <label style="flex: 1; text-align: left; color: #aaa;">Standard (£/hr):
-        <input id="rate-standard" type="text" value="20" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px;width:100%;">
+    <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+      <label style="flex: 1; text-align: left; color: #aaa; min-width: 120px;">Standard (£/hr):
+        <input id="rate-standard" type="text" value="20" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px;width:100%;box-sizing:border-box;">
       </label>
-      <label style="flex: 1; text-align: left; color: #aaa;">Rota A Fee (£):
-        <input id="rate-rota-a" type="text" value="30" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px;width:100%;">
+      <label style="flex: 1; text-align: left; color: #aaa; min-width: 120px;">Rota A Fee (£):
+        <input id="rate-rota-a" type="text" value="30" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px;width:100%;box-sizing:border-box;">
       </label>
-      <label style="flex: 1; text-align: left; color: #aaa;">Rota D Fee (£):
-        <input id="rate-rota-d" type="text" value="40" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px;width:100%;">
+      <label style="flex: 1; text-align: left; color: #aaa; min-width: 120px;">Rota D Fee (£):
+        <input id="rate-rota-d" type="text" value="40" style="background:#2a2a2a;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:5px;width:100%;box-sizing:border-box;">
       </label>
     </div>
     <div style="text-align: left; color: #aaa; font-size: 14px; margin-top: 20px;">
