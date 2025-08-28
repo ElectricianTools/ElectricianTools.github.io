@@ -23,11 +23,16 @@
   .block .content{padding:12px}
   .project-photo{border:1px dashed var(--brand-gold);border-radius:10px;min-height:170px;max-height:400px;min-width:200px;display:grid;place-items:center;color:var(--muted);position:relative;overflow:hidden;cursor:pointer;margin-bottom:12px;resize:both}
   .project-photo img{max-width:none;max-height:none;object-fit:contain;cursor:move;transition:transform 0.1s ease}
-  .image-controls{position:absolute;top:5px;right:5px;display:flex;gap:3px;z-index:10;opacity:0.9}
-  .image-controls button{background:rgba(0,0,0,0.7);color:white;border:none;border-radius:3px;width:28px;height:28px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+  .image-controls{position:absolute;top:5px;right:5px;display:none;gap:3px;z-index:10;opacity:0.9}
+  .image-controls button{background:rgba(0,0,0,0.7);color:white;border:none;border-radius:3px;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
   .image-controls button:hover{background:rgba(0,0,0,0.9)}
+  .move-controls{display:flex;flex-direction:column;gap:2px}
+  .move-controls button{width:24px;height:24px;font-size:12px}
   .project-photo:hover .image-controls{display:flex}
   .obs:hover .image-controls{display:flex}
+  @media (max-width: 768px) {
+    .image-controls{display:flex !important}
+  }
   .plus{position:absolute;inset:0;display:grid;place-items:center;font-size:28px;font-weight:900;color:#c084fc;mix-blend:multiply}
   .hint{position:absolute;bottom:8px;left:12px;right:12px;text-align:center;color:var(--muted);font-size:10pt}
   .details{width:100%;border-collapse:collapse}
@@ -263,6 +268,23 @@
   // Image manipulation functions
   let imageTransforms = {};
   
+  function moveImage(imgId, direction, distance = 10) {
+    const img = document.getElementById(imgId);
+    if (!img || !img.src) return;
+    
+    if (!imageTransforms[imgId]) {
+      imageTransforms[imgId] = { rotation: 0, scale: 1, x: 0, y: 0 };
+    }
+    
+    switch(direction) {
+      case 'up': imageTransforms[imgId].y -= distance; break;
+      case 'down': imageTransforms[imgId].y += distance; break;
+      case 'left': imageTransforms[imgId].x -= distance; break;
+      case 'right': imageTransforms[imgId].x += distance; break;
+    }
+    applyTransform(imgId);
+  }
+  
   function rotateImage(imgId, degrees) {
     const img = document.getElementById(imgId);
     if (!img || !img.src) return;
@@ -332,121 +354,6 @@
       };
       reader.readAsDataURL(file);
     });
-    
-    // Mouse events for desktop
-    let isDragging = false;
-    let startX, startY;
-    
-    img.addEventListener('mousedown', (e) => {
-      if (!img.src || img.src.includes('data:') === false) return;
-      isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      e.preventDefault();
-    });
-    
-    document.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      const deltaX = e.clientX - startX;
-      const deltaY = e.clientY - startY;
-      
-      if (!imageTransforms[imgId]) {
-        imageTransforms[imgId] = { rotation: 0, scale: 1, x: 0, y: 0 };
-      }
-      
-      imageTransforms[imgId].x += deltaX;
-      imageTransforms[imgId].y += deltaY;
-      applyTransform(imgId);
-      
-      startX = e.clientX;
-      startY = e.clientY;
-    });
-    
-    document.addEventListener('mouseup', () => {
-      isDragging = false;
-    });
-    
-    // Touch events for mobile
-    let touchStartDistance = 0;
-    let lastTouchScale = 1;
-    let touchStartX = 0, touchStartY = 0;
-    let isTouchDragging = false;
-    
-    img.addEventListener('touchstart', (e) => {
-      if (!img.src || img.src.includes('data:') === false) return;
-      e.preventDefault();
-      
-      if (e.touches.length === 1) {
-        // Single touch - drag
-        isTouchDragging = true;
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-      } else if (e.touches.length === 2) {
-        // Two touches - pinch to zoom
-        isTouchDragging = false;
-        const touch1 = e.touches[0];
-        const touch2 = e.touches[1];
-        touchStartDistance = Math.sqrt(
-          Math.pow(touch2.clientX - touch1.clientX, 2) +
-          Math.pow(touch2.clientY - touch1.clientY, 2)
-        );
-        if (!imageTransforms[imgId]) {
-          imageTransforms[imgId] = { rotation: 0, scale: 1, x: 0, y: 0 };
-        }
-        lastTouchScale = imageTransforms[imgId].scale;
-      }
-    });
-    
-    img.addEventListener('touchmove', (e) => {
-      if (!img.src || img.src.includes('data:') === false) return;
-      e.preventDefault();
-      
-      if (e.touches.length === 1 && isTouchDragging) {
-        // Single touch drag
-        const deltaX = e.touches[0].clientX - touchStartX;
-        const deltaY = e.touches[0].clientY - touchStartY;
-        
-        if (!imageTransforms[imgId]) {
-          imageTransforms[imgId] = { rotation: 0, scale: 1, x: 0, y: 0 };
-        }
-        
-        imageTransforms[imgId].x += deltaX;
-        imageTransforms[imgId].y += deltaY;
-        applyTransform(imgId);
-        
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-      } else if (e.touches.length === 2) {
-        // Pinch to zoom
-        const touch1 = e.touches[0];
-        const touch2 = e.touches[1];
-        const currentDistance = Math.sqrt(
-          Math.pow(touch2.clientX - touch1.clientX, 2) +
-          Math.pow(touch2.clientY - touch1.clientY, 2)
-        );
-        
-        if (touchStartDistance > 0) {
-          const scale = (currentDistance / touchStartDistance) * lastTouchScale;
-          imageTransforms[imgId].scale = Math.max(0.1, Math.min(3, scale));
-          applyTransform(imgId);
-        }
-      }
-    });
-    
-    img.addEventListener('touchend', (e) => {
-      isTouchDragging = false;
-      if (e.touches.length < 2) {
-        touchStartDistance = 0;
-      }
-    });
-    
-    // Mouse wheel zoom for desktop
-    wrap.addEventListener('wheel', (e) => {
-      if (!img.src || img.src.includes('data:') === false) return;
-      e.preventDefault();
-      const factor = e.deltaY > 0 ? 0.9 : 1.1;
-      scaleImage(imgId, factor);
-    });
   }
   bindClickToUpload('logoWrap','logoInput','logo');
   bindClickToUpload('projectPhotoWrap','projectPhotoInput','projectPhoto');
@@ -482,6 +389,14 @@
         <img id="img_${id}" alt=""/>
         <div class="plus">+</div>
         <div class="image-controls">
+          <div class="move-controls">
+            <button title="Move Up" onclick="moveImage('img_${id}', 'up')">↑</button>
+            <div style="display:flex;gap:2px;">
+              <button title="Move Left" onclick="moveImage('img_${id}', 'left')">←</button>
+              <button title="Move Right" onclick="moveImage('img_${id}', 'right')">→</button>
+            </div>
+            <button title="Move Down" onclick="moveImage('img_${id}', 'down')">↓</button>
+          </div>
           <button title="Rotate Left" onclick="rotateImage('img_${id}', -15)">↺</button>
           <button title="Rotate Right" onclick="rotateImage('img_${id}', 15)">↻</button>
           <button title="Zoom In" onclick="scaleImage('img_${id}', 1.1)">+</button>
@@ -499,7 +414,7 @@
     const img=item.querySelector('#img_'+id);
     
     frame.addEventListener('click', (e) => {
-      if (e.target === img || e.target.closest('.image-controls')) return; // Don't trigger upload when clicking on image or controls
+      if (e.target === img || e.target.closest('.image-controls')) return;
       input.click();
     });
     
@@ -509,130 +424,17 @@
       reader.onload=ev=>{ 
         img.src=ev.target.result; 
         frame.querySelector('.plus')?.remove();
-        // Reset transforms when new image is loaded
         imageTransforms[img.id] = { rotation: 0, scale: 1, x: 0, y: 0 };
-        // Auto-expand frame to show image
         if (img.naturalHeight > 0) {
           const newHeight = Math.min(200, Math.max(100, img.naturalHeight * 0.3));
           frame.style.height = newHeight + 'px';
           const aspectRatio = img.naturalWidth / img.naturalHeight;
-          if (aspectRatio > 1.5) { // Wide image
+          if (aspectRatio > 1.5) {
             frame.style.width = Math.min(250, newHeight * aspectRatio) + 'px';
           }
         }
       };
       reader.readAsDataURL(file);
-    });
-    
-    // Touch and mouse events for observations
-    let isDragging = false;
-    let startX, startY;
-    let touchStartDistance = 0;
-    let lastTouchScale = 1;
-    let touchStartX = 0, touchStartY = 0;
-    let isTouchDragging = false;
-    
-    // Mouse events
-    img.addEventListener('mousedown', (e) => {
-      if (!img.src || img.src.includes('data:') === false) return;
-      isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      e.preventDefault();
-    });
-    
-    document.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      const deltaX = e.clientX - startX;
-      const deltaY = e.clientY - startY;
-      
-      if (!imageTransforms[img.id]) {
-        imageTransforms[img.id] = { rotation: 0, scale: 1, x: 0, y: 0 };
-      }
-      
-      imageTransforms[img.id].x += deltaX;
-      imageTransforms[img.id].y += deltaY;
-      applyTransform(img.id);
-      
-      startX = e.clientX;
-      startY = e.clientY;
-    });
-    
-    document.addEventListener('mouseup', () => {
-      isDragging = false;
-    });
-    
-    // Touch events for mobile
-    img.addEventListener('touchstart', (e) => {
-      if (!img.src || img.src.includes('data:') === false) return;
-      e.preventDefault();
-      
-      if (e.touches.length === 1) {
-        isTouchDragging = true;
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-      } else if (e.touches.length === 2) {
-        isTouchDragging = false;
-        const touch1 = e.touches[0];
-        const touch2 = e.touches[1];
-        touchStartDistance = Math.sqrt(
-          Math.pow(touch2.clientX - touch1.clientX, 2) +
-          Math.pow(touch2.clientY - touch1.clientY, 2)
-        );
-        if (!imageTransforms[img.id]) {
-          imageTransforms[img.id] = { rotation: 0, scale: 1, x: 0, y: 0 };
-        }
-        lastTouchScale = imageTransforms[img.id].scale;
-      }
-    });
-    
-    img.addEventListener('touchmove', (e) => {
-      if (!img.src || img.src.includes('data:') === false) return;
-      e.preventDefault();
-      
-      if (e.touches.length === 1 && isTouchDragging) {
-        const deltaX = e.touches[0].clientX - touchStartX;
-        const deltaY = e.touches[0].clientY - touchStartY;
-        
-        if (!imageTransforms[img.id]) {
-          imageTransforms[img.id] = { rotation: 0, scale: 1, x: 0, y: 0 };
-        }
-        
-        imageTransforms[img.id].x += deltaX;
-        imageTransforms[img.id].y += deltaY;
-        applyTransform(img.id);
-        
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-      } else if (e.touches.length === 2) {
-        const touch1 = e.touches[0];
-        const touch2 = e.touches[1];
-        const currentDistance = Math.sqrt(
-          Math.pow(touch2.clientX - touch1.clientX, 2) +
-          Math.pow(touch2.clientY - touch1.clientY, 2)
-        );
-        
-        if (touchStartDistance > 0) {
-          const scale = (currentDistance / touchStartDistance) * lastTouchScale;
-          imageTransforms[img.id].scale = Math.max(0.1, Math.min(3, scale));
-          applyTransform(img.id);
-        }
-      }
-    });
-    
-    img.addEventListener('touchend', (e) => {
-      isTouchDragging = false;
-      if (e.touches.length < 2) {
-        touchStartDistance = 0;
-      }
-    });
-
-    // Mouse wheel zoom for observations
-    frame.addEventListener('wheel', (e) => {
-      if (!img.src || img.src.includes('data:') === false) return;
-      e.preventDefault();
-      const factor = e.deltaY > 0 ? 0.9 : 1.1;
-      scaleImage(img.id, factor);
     });
     item.querySelector('.del').addEventListener('click',()=> item.remove());
   });
