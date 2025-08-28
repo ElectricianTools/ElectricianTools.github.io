@@ -7,7 +7,510 @@
 <style>
   :root { --brand-dark:#1e293b; --brand-gold:#d4af37; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --paper:#ffffff; }
   @page { size:A4; margin:14mm; }
+  html,body{height:100%;background:#f5f7fb}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Patriot Electrical Limited - Machine Electrical Connection Handover V2</title>
+<style>
+  :root { --brand-dark:#1e293b; --brand-gold:#d4af37; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --paper:#ffffff; }
+  @page { size:A4; margin:14mm; }
   html,body{height:100%;background:#f5f7fb}
+  body{font:12pt/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial; color:var(--ink); margin:0}
+  .sheet{width:210mm;min-height:297mm;margin:0 auto;background:var(--paper);box-shadow:0 4px 20px rgba(2,6,23,.1);position:relative;padding-bottom:20mm}
+  .header-bar{display:grid;grid-template-columns:120px 1fr;align-items:center;gap:16px;padding:16px 18px;background:#fff;color:var(--ink);border-bottom:4px solid var(--brand-gold)}
+  .logo-wrap{width:120px;height:48px;background:#fff;border-radius:6px;padding:6px;display:grid;place-items:center;position:relative;cursor:pointer}
+  .logo{width:100%;height:100%;object-fit:contain}
+  .logo-plus{position:absolute;inset:0;display:grid;place-items:center;color:#475569;font-weight:800;font-size:18px;opacity:.8}
+  .company{display:none}
+  .title{ text-align:center;padding:14px 18px 6px;font-weight:800;font-size:16pt}
+  .subtitle{text-align:center;color:var(--muted);margin-bottom:10px}
+  .block{margin:14px 18px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .block h3{margin:0;padding:10px 12px;background:#f8fafc;border-bottom:1px solid var(--line);color:var(--brand-dark);font-size:11pt;text-transform:uppercase;letter-spacing:.06em}
+  .block .content{padding:12px}
+  .project-photo{border:1px dashed var(--brand-gold);border-radius:10px;height:250px;width:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);position:relative;overflow:hidden;cursor:pointer;margin-bottom:12px}
+  .project-photo img{max-width:100%;max-height:100%;object-fit:contain;cursor:grab;transition:transform 0.1s ease}
+  .plus{position:absolute;inset:0;display:grid;place-items:center;font-size:28px;font-weight:900;color:#c084fc;mix-blend:multiply}
+  .hint{position:absolute;bottom:8px;left:12px;right:12px;text-align:center;color:var(--muted);font-size:10pt}
+  .details{width:100%;border-collapse:collapse}
+  .details th,.details td{border:1px solid var(--line);padding:8px 10px;font-size:10.5pt}
+  .details th{width:36%;text-align:left;background:#f8fafc}
+  ul.clean{margin:8px 0 0 18px}
+  ul.clean li{margin:4px 0}
+  .checklist{list-style:none;margin:0;padding:0}
+  .checklist li{display:flex;align-items:center;gap:8px;margin:6px 0}
+  .cb{display:inline-grid;place-items:center;width:16px;height:16px;border:1.5px solid var(--brand-dark);border-radius:3px;cursor:pointer;font-size:12px;user-select:none}
+  .cb[data-checked="true"]{background:var(--brand-dark);color:#fff}
+  .muted{color:var(--muted)}
+  .disclaimer{border:1px solid #e2e8f0;border-left:4px solid var(--brand-gold);background:#fffbeb;padding:10px 12px;border-radius:8px}
+  .warning{border:1px solid #ef4444;border-left:4px solid #ef4444;background:#fef2f2;padding:10px 12px;border-radius:8px;color:#991b1b}
+  .legal-box{border:2px solid var(--brand-dark);background:#f8fafc;padding:12px;border-radius:8px;margin:10px 0}
+  .obs-head{display:flex;justify-content:flex-end;align-items:center;margin-bottom:10px}
+  .add-btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;font-size:10pt;cursor:pointer}
+  .add-btn:hover{border-color:#cbd5e1}
+  .obs-list{display:grid;gap:10px}
+  .obs{border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;grid-template-columns:140px 1fr 28px;gap:10px;align-items:start}
+  .obs .frame{height:120px;width:140px;border:1px dashed var(--brand-gold);border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:pointer}
+  .obs img{max-width:100%;max-height:100%;object-fit:contain;cursor:grab;transition:transform 0.1s ease}
+  .obs textarea{width:100%;min-height:96px;border:1px solid var(--line);border-radius:8px;padding:8px;font:10.5pt/1.35 inherit;resize:vertical}
+  .obs .del{border:none;background:transparent;font-size:18px;cursor:pointer;color:#94a3b8}
+  .obs .del:hover{color:#ef4444}
+  .sigs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .sig{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .sig label{display:block;font-size:9pt;color:var(--muted)}
+  .sig .line{border-bottom:1px solid #cbd5e1;height:24px;margin:6px 0 10px}
+  .footer{position:absolute;bottom:8mm;left:0;right:0;text-align:center;color:var(--muted);font-size:9pt;z-index:1000;background:transparent}
+  .pdf-btn{position:fixed;bottom:20px;left:20px;background:var(--brand-dark);color:#fff;border:none;border-radius:8px;padding:12px 16px;font-size:11pt;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(30,41,59,0.3);transition:all 0.2s ease;z-index:1001}
+  .pdf-btn:hover{background:#334155;transform:translateY(-1px);box-shadow:0 6px 16px rgba(30,41,59,0.4)}
+  .reset-btn{position:fixed;bottom:20px;left:160px;background:#ef4444;color:#fff;border:none;border-radius:8px;padding:12px 16px;font-size:11pt;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(239,68,68,0.3);transition:all 0.2s ease;z-index:1001}
+  .reset-btn:hover{background:#dc2626;transform:translateY(-1px);box-shadow:0 6px 16px rgba(239,68,68,0.4)}
+  .acknowledgment{display:flex;align-items:flex-start;gap:8px;margin:8px 0;padding:8px;background:#f1f5f9;border-radius:6px}
+  .ack-cb{flex-shrink:0;margin-top:2px}
+  .image-controls{position:absolute;top:5px;right:5px;display:flex;gap:3px;z-index:100;background:rgba(0,0,0,0.2);padding:4px;border-radius:5px}
+  .image-controls button{background:#1e293b;color:white;border:none;border-radius:3px;width:28px;height:28px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .image-controls button:hover{background:#334155}
+  .obs .image-controls button{width:20px;height:20px;font-size:11px}
+  @media print{body{background:#fff}.sheet{box-shadow:none}.pdf-btn{display:none}.reset-btn{display:none}.add-btn{display:none}.obs .del{display:none}.image-controls{display:none !important}.subtitle span{background:var(--brand-dark) !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<section class="sheet">
+  <header class="header-bar">
+    <div class="logo-wrap" id="logoWrap" title="Click to add logo">
+      <img id="logo" class="logo" alt="Patriot Logo" />
+      <div class="logo-plus">+</div>
+    </div>
+  </header>
+
+  <div class="title">MACHINE ELECTRICAL CONNECTION</div>
+  <div class="subtitle"><span style="background:var(--brand-dark);color:#fff;border-radius:999px;padding:2px 10px;font-size:10pt;font-weight:600;letter-spacing:.04em">HANDOVER & LIMITATION OF RESPONSIBILITY</span></div>
+
+  <section class="block">
+    <h3>Project / Machine Details</h3>
+    <div class="content">
+      <div class="project-photo" id="projectPhotoWrap" title="Click to add project photo">
+        <img id="projectPhoto" alt="Project photo" />
+        <div class="plus">+</div>
+        <div class="hint">Add a clear photo of the machine/area (prints with the certificate)</div>
+        <div class="image-controls" style="display:none;">
+          <button onclick="rotateImage('projectPhoto', -15)" title="Rotate Left">↺</button>
+          <button onclick="rotateImage('projectPhoto', 15)" title="Rotate Right">↻</button>
+          <button onclick="scaleImage('projectPhoto', 0.9)" title="Zoom Out">−</button>
+          <button onclick="scaleImage('projectPhoto', 1.1)" title="Zoom In">+</button>
+          <button onclick="resetImage('projectPhoto')" title="Reset">⌂</button>
+        </div>
+      </div>
+      <table class="details">
+        <tr><th>Project / Machine ID</th><td contenteditable="true">&nbsp;</td></tr>
+        <tr><th>Location</th><td contenteditable="true">&nbsp;</td></tr>
+        <tr><th>Date</th><td contenteditable="true" id="today">&nbsp;</td></tr>
+        <tr><th>Installer</th><td>Patriot Electrical Limited</td></tr>
+        <tr><th>Client / Owner</th><td contenteditable="true">&nbsp;</td></tr>
+        <tr><th>Client / Owner Address</th><td contenteditable="true">&nbsp;</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3>Documents - Received from Client / Designer</h3>
+    <div class="content">
+      <ul class="checklist" id="docsClient">
+        <li><span class="cb" data-checked="true">✓</span> Connection / termination drawings</li>
+        <li><span class="cb" data-checked="false"></span> DSEAR zone drawings</li>
+        <li><span class="cb" data-checked="false"></span> Commissioning plan & test documentation</li>
+        <li><span class="cb" data-checked="false"></span> PUWER pre-use inspection records</li>
+        <li><span class="cb" data-checked="false"></span> Declaration of Conformity (UKCA / CE)</li>
+        <li><span class="cb" data-checked="false"></span> Operating & maintenance manuals</li>
+        <li><span class="cb" data-checked="false"></span> Technical file availability statement</li>
+        <li><span class="cb" data-checked="false"></span> Risk assessment documentation</li>
+        <li contenteditable="true" class="muted">Add other client-provided documents...</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3>Documents - Issued by Patriot Electrical Limited</h3>
+    <div class="content">
+      <ul class="checklist" id="docsPatriot">
+        <li><span class="cb" data-checked="true">✓</span> Electrical Installation Certificate - panel supply cable</li>
+        <li><span class="cb" data-checked="true">✓</span> This Handover & Limitation of Responsibility form</li>
+        <li><span class="cb" data-checked="false"></span> Other (specify): <span contenteditable="true" class="muted">Type here...</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3>Handover Status & Critical Safety Warning</h3>
+    <div class="content">
+      <div class="warning">
+        <strong>⚠️ CRITICAL SAFETY WARNING:</strong> Machine energised for connection testing only. <strong>NOT commissioned, NOT certified safe for operation, NOT suitable for production use.</strong> Operation without proper commissioning may result in serious injury, death, or property damage.
+      </div>
+      <div class="disclaimer">
+        <strong>Status at handover:</strong> Electrical connection work completed to BS 7671 standards. Machine commissioning, safety verification, and operational approval remain outstanding and are exclusively the responsibility of the client/owner.
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3>Limitation of Liability & Scope of Work</h3>
+    <div class="content">
+      <div class="legal-box">
+        <strong>Patriot Electrical Limited's scope of work is strictly limited to:</strong>
+        <ul class="clean">
+          <li>Electrical connection and basic continuity testing only</li>
+          <li>Compliance with BS 7671 for supply cable installation</li>
+          <li>Provision of Electrical Installation Certificate for supply connection</li>
+        </ul>
+        
+        <strong>Patriot Electrical Limited expressly excludes all liability for:</strong>
+        <ul class="clean">
+          <li>Machine commissioning, functional testing, and safety verification</li>
+          <li>Compliance with machinery safety regulations (PUWER, DSEAR, etc.)</li>
+          <li>Any incident, injury, or damage arising from machine operation</li>
+          <li>Consequential losses, business interruption, or indirect damages</li>
+          <li>Work performed by others after this handover</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3>Client/Owner Mandatory Responsibilities</h3>
+    <div class="content">
+      <strong>BEFORE OPERATING THIS MACHINE, the client/owner MUST ensure:</strong>
+      <ul class="clean">
+        <li><strong>UKCA/CE marking and signed Declaration of Conformity</strong> - Legal requirement for machinery use</li>
+        <li><strong>Complete technical file</strong> - Design drawings, risk assessment per EN ISO 12100, test results, applicable standards</li>
+        <li><strong>Professional commissioning</strong> - Functional safety verification per EN 60204-1, EN ISO 13849 by qualified personnel</li>
+        <li><strong>PUWER pre-use inspection</strong> - Mandatory inspection and certification before first use</li>
+        <li><strong>DSEAR compliance</strong> - Zone classification and appropriate protective measures where applicable</li>
+        <li><strong>Training provision</strong> - Operating & maintenance instructions provided to all users in English</li>
+        <li><strong>Competent person appointment</strong> - Designated responsible person for ongoing safety compliance</li>
+      </ul>
+      
+      <div class="warning">
+        <strong>Legal Notice:</strong> Failure to complete these requirements before operation may result in prosecution under Health & Safety at Work Act 1974, corporate manslaughter charges, insurance voidance, and unlimited liability for damages.
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3>Client Acknowledgment & Indemnification</h3>
+    <div class="content">
+      <div class="legal-box">
+        <div class="acknowledgment">
+          <span class="cb ack-cb" data-checked="false" id="ack1"></span>
+          <span>I/We acknowledge that I/we have read, understood, and accept full responsibility for completing all outstanding commissioning and safety requirements before operating this machine.</span>
+        </div>
+        <div class="acknowledgment">
+          <span class="cb ack-cb" data-checked="false" id="ack2"></span>
+          <span>I/We confirm that I/we have adequate technical competency or will engage qualified professionals to complete the outstanding work.</span>
+        </div>
+        <div class="acknowledgment">
+          <span class="cb ack-cb" data-checked="false" id="ack3"></span>
+          <span>I/We agree to indemnify and hold harmless Patriot Electrical Limited from any claims, damages, or losses arising from machine operation or failure to complete required commissioning work.</span>
+        </div>
+        <div class="acknowledgment">
+          <span class="cb ack-cb" data-checked="false" id="ack4"></span>
+          <span>I/We confirm that our insurers have been notified of this machine installation and any additional coverage required has been arranged.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="obsBlock">
+    <h3>Observations / Outstanding Safety Issues</h3>
+    <div class="content">
+      <div class="obs-head">
+        <button class="add-btn" id="addObs">+ Add observation</button>
+      </div>
+      <div class="obs-list" id="obsList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3>Sign-Off & Legal Acceptance</h3>
+    <div class="content sigs">
+      <div class="sig">
+        <label>Installer Name</label>
+        <div class="line" contenteditable="true"></div>
+        <label>Signature</label>
+        <div class="line" contenteditable="true"></div>
+        <label>Date</label>
+        <div class="line" contenteditable="true"></div>
+        <label>Position</label>
+        <div class="line" contenteditable="true"></div>
+      </div>
+      <div class="sig">
+        <label>Client / Owner Name</label>
+        <div class="line" contenteditable="true"></div>
+        <label>Signature</label>
+        <div class="line" contenteditable="true"></div>
+        <label>Date</label>
+        <div class="line" contenteditable="true"></div>
+        <label>Position</label>
+        <div class="line" contenteditable="true"></div>
+      </div>
+    </div>
+    <div class="legal-box" style="margin-top:15px;">
+      <strong>By signing above, the client/owner confirms:</strong> Full acceptance of all responsibilities, limitations of liability, and indemnification terms set out in this document. This constitutes a legally binding agreement.
+    </div>
+  </section>
+
+  <div class="footer">Patriot Electrical Limited • Company No. 07303990 • James@PatriotElectricalLTD.com • 07525041141 • Version 2.0</div>
+</section>
+
+<button class="pdf-btn" id="pdfBtn">📄 Generate PDF</button>
+<button class="reset-btn" id="resetBtn">🔄 Reset Form</button>
+
+<input type="file" id="logoInput" accept="image/*" hidden>
+<input type="file" id="projectPhotoInput" accept="image/*" hidden>
+
+<script>
+// Set today's date
+(function(){
+  const el=document.getElementById('today');
+  const d=new Date(); 
+  const pad=n=>String(n).padStart(2,'0');
+  if(el) el.textContent=`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+})();
+
+// Form memory functionality
+function saveFormData() {
+  const formData = {};
+  document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+    if (el.id || el.textContent.trim()) {
+      const key = el.id || el.textContent.trim().substring(0, 20);
+      formData[key] = el.textContent;
+    }
+  });
+  document.querySelectorAll('.cb').forEach((el, index) => {
+    formData[`checkbox_${index}`] = el.getAttribute('data-checked');
+  });
+  document.querySelectorAll('textarea').forEach((el, index) => {
+    formData[`textarea_${index}`] = el.value;
+  });
+  try {
+    localStorage.setItem('patriotHandoverForm', JSON.stringify(formData));
+  } catch (e) {
+    console.log('Form data not saved - localStorage not available');
+  }
+}
+
+function loadFormData() {
+  try {
+    const saved = localStorage.getItem('patriotHandoverForm');
+    if (!saved) return;
+    const formData = JSON.parse(saved);
+    document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+      const key = el.id || el.textContent.trim().substring(0, 20);
+      if (formData[key]) {
+        el.textContent = formData[key];
+      }
+    });
+    document.querySelectorAll('.cb').forEach((el, index) => {
+      const saved = formData[`checkbox_${index}`];
+      if (saved) {
+        el.setAttribute('data-checked', saved);
+        el.textContent = saved === 'true' ? '✓' : '';
+      }
+    });
+    document.querySelectorAll('textarea').forEach((el, index) => {
+      const saved = formData[`textarea_${index}`];
+      if (saved) {
+        el.value = saved;
+      }
+    });
+  } catch (e) {
+    console.log('Could not load form data');
+  }
+}
+
+function resetForm() {
+  if (confirm('⚠️ Are you sure you want to reset the entire form?\n\nThis will clear all entered data, uploaded images, and observations. This action cannot be undone.')) {
+    try {
+      localStorage.removeItem('patriotHandoverForm');
+    } catch (e) {}
+    document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+      if (el.id !== 'today') {
+        el.textContent = '\u00A0';
+      }
+    });
+    document.querySelectorAll('.cb').forEach(el => {
+      const isPreChecked = el.closest('li')?.textContent.includes('Connection / termination drawings') ||
+                          el.closest('li')?.textContent.includes('Electrical Installation Certificate') ||
+                          el.closest('li')?.textContent.includes('This Handover');
+      el.setAttribute('data-checked', isPreChecked ? 'true' : 'false');
+      el.textContent = isPreChecked ? '✓' : '';
+    });
+    document.querySelectorAll('textarea').forEach(el => {
+      el.value = '';
+    });
+    document.querySelectorAll('img[id]').forEach(img => {
+      if (img.id === 'logo' || img.id === 'projectPhoto' || img.id.startsWith('img')) {
+        img.src = '';
+        const container = img.closest('.project-photo, .frame');
+        const controls = container?.querySelector('.image-controls');
+        if (controls) controls.style.display = 'none';
+        if (!container?.querySelector('.plus')) {
+          const plus = document.createElement('div');
+          plus.className = 'plus';
+          plus.textContent = '+';
+          container?.appendChild(plus);
+        }
+        if (img.id === 'projectPhoto' && !container?.querySelector('.hint')) {
+          const hint = document.createElement('div');
+          hint.className = 'hint';
+          hint.textContent = 'Add a clear photo of the machine/area (prints with the certificate)';
+          container?.appendChild(hint);
+        }
+      }
+    });
+    document.getElementById('obsList').innerHTML = '';
+    obsCounter = 0;
+    imageData = {};
+    alert('✅ Form has been reset successfully!');
+  }
+}
+
+document.addEventListener('input', saveFormData);
+document.addEventListener('click', (e) => {
+  if (e.target.matches('.cb, .ack-cb')) {
+    setTimeout(saveFormData, 10);
+  }
+});
+document.addEventListener('DOMContentLoaded', loadFormData);
+
+var imageData = {};
+
+function rotateImage(imgId, degrees) {
+  const img = document.getElementById(imgId);
+  if (!img || !img.src) return;
+  if (!imageData[imgId]) {
+    imageData[imgId] = { x: 0, y: 0, scale: 1, rotation: 0 };
+  }
+  imageData[imgId].rotation += degrees;
+  applyTransform(imgId);
+}
+
+function scaleImage(imgId, factor) {
+  const img = document.getElementById(imgId);
+  if (!img || !img.src) return;
+  if (!imageData[imgId]) {
+    imageData[imgId] = { x: 0, y: 0, scale: 1, rotation: 0 };
+  }
+  imageData[imgId].scale *= factor;
+  if (imageData[imgId].scale < 0.1) imageData[imgId].scale = 0.1;
+  if (imageData[imgId].scale > 3) imageData[imgId].scale = 3;
+  applyTransform(imgId);
+}
+
+function resetImage(imgId) {
+  imageData[imgId] = { x: 0, y: 0, scale: 1, rotation: 0 };
+  applyTransform(imgId);
+}
+
+function applyTransform(imgId) {
+  const img = document.getElementById(imgId);
+  const data = imageData[imgId];
+  if (!img || !data) return;
+  img.style.transformOrigin = 'center center';
+  img.style.transform = `translate(${data.x}px, ${data.y}px) scale(${data.scale}) rotate(${data.rotation}deg)`;
+}
+
+function setupImageUpload(wrapperId, inputId, imgId) {
+  const wrap = document.getElementById(wrapperId);
+  const input = document.getElementById(inputId);
+  const img = document.getElementById(imgId);
+  const controls = wrap.querySelector('.image-controls');
+  
+  if (!wrap || !input || !img) return;
+  
+  wrap.addEventListener('click', (e) => {
+    if (e.target === img || e.target.closest('.image-controls')) return;
+    input.click();
+  });
+  
+  input.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      img.src = ev.target.result;
+      img.onload = () => {
+        const plus = wrap.querySelector('.plus');
+        const hint = wrap.querySelector('.hint');
+        if (plus) plus.remove();
+        if (hint) hint.remove();
+        if (controls) controls.style.display = 'flex';
+        let initialScale = 0.8;
+        imageData[imgId] = { x: 0, y: 0, scale: initialScale, rotation: 0 };
+        applyTransform(imgId);
+      };
+    };
+    reader.readAsDataURL(file);
+  });
+  
+  let isDragging = false;
+  let startX, startY;
+  
+  img.addEventListener('mousedown', (e) => {
+    if (!img.src) return;
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    e.preventDefault();
+    img.style.cursor = 'grabbing';
+  });
+  
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const deltaX = e.clientX - startX;
+    const deltaY = e.clientY - startY;
+    if (!imageData[imgId]) {
+      imageData[imgId] = { x: 0, y: 0, scale: 1, rotation: 0 };
+    }
+    imageData[imgId].x += deltaX;
+    imageData[imgId].y += deltaY;
+    applyTransform(imgId);
+    startX = e.clientX;
+    startY = e.clientY;
+  });
+  
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+    img.style.cursor = 'grab';
+  });
+  
+  let touchStartX1, touchStartY1, touchStartX2, touchStartY2;
+  let isTouchDragging = false;
+  
+  img.addEventListener('touchstart', (e) => {
+    if (!img.src) return;
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      isTouchDragging = true;
+      touchStartX1 = e.touches[0].clientX;
+      touchStartY1 = e.touches[0].clientY;
+      touchStartX2 = e.touches[1].clientX;
+      touchStartY2 = e.touches[1].clientY;
+    }
+  });
+  
+  img.addEventListener('touchmove', (e) => {
+    if (!img.src || !isTouchDragging || e.touches.length !== 2) return;
+    e.preventDefault();
+    const currentX1 = e.touches[0].clientX;
+    const currentY1 = e.touches[0].clientY;
+    const currentX2 = e.touches[1].clientX;
+    const currentY2 = e.touches[1].clientY;
+    const currentCenterX = (currentX1 + currentX2) / 2;
+    const currentCenterY = (currentY1 + currentY2) / 2;
+    const startCenterX = (touchStartX1 + touchStartX2) / 2;
+    const startCenterY = (touchStartY1 + touchStartY2) / 2;
+    const deltaX = currentCenterX - startCenterX;
+    const deltaY = currentC
   body{font:12pt/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial; color:var(--ink); margin:0}
   .sheet{width:210mm;min-height:297mm;margin:0 auto;background:var(--paper);box-shadow:0 4px 20px rgba(2,6,23,.1);position:relative;padding-bottom:40mm}
   .header-bar{display:grid;grid-template-columns:120px 1fr;align-items:center;gap:16px;padding:16px 18px;background:#fff;color:var(--ink);border-bottom:4px solid var(--brand-gold)}
