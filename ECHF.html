@@ -33,6 +33,8 @@
   .checklist li{display:flex;align-items:center;gap:8px;margin:6px 0}
   .cb{display:inline-grid;place-items:center;width:16px;height:16px;border:1.5px solid var(--brand-dark);border-radius:3px;cursor:pointer;font-size:12px;user-select:none}
   .cb[data-checked="true"]{background:var(--brand-dark);color:#fff}
+  .yes-no{display:flex;align-items:center;gap:4px}
+  .yes-no .cb{margin:0}
   .muted{color:var(--muted)}
   .disclaimer{border:1px solid #e2e8f0;border-left:4px solid var(--brand-gold);background:#fffbeb;padding:10px 12px;border-radius:8px}
   .warning{border:1px solid #ef4444;border-left:4px solid #ef4444;background:#fef2f2;padding:10px 12px;border-radius:8px;color:#991b1b}
@@ -62,14 +64,14 @@
   .image-controls button:hover{background:#334155}
   .obs .image-controls button{width:20px;height:20px;font-size:11px}
   
-  @media print{body{background:#fff}.sheet{box-shadow:none}.pdf-btn{display:none}.add-btn{display:none}.obs .del{display:none}.image-controls{display:none}.subtitle span{background:var(--brand-dark) !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  @media print{body{background:#fff}.sheet{box-shadow:none}.pdf-btn{display:none}.add-btn{display:none}.obs .del{display:none}.image-controls,.project-photo .image-controls,.logo-wrap .image-controls,.obs .image-controls{display:none !important;visibility:hidden !important}.subtitle span{background:var(--brand-dark) !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.cb{border:1.5px solid #1e293b !important;background:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.cb[data-checked="true"]{background:#1e293b !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.logo:not([src]),.logo[src=""]{display:none !important}.logo-plus{display:none !important}}
 </style>
 </head>
 <body>
 <section class="sheet">
   <header class="header-bar">
-    <div class="logo-wrap" id="logoWrap" title="Click to add logo">
-      <img id="logo" class="logo" alt="Patriot Logo" />
+    <div class="logo-wrap" id="logoWrap" title="Click to add company logo">
+      <img id="logo" class="logo" alt="Logo" />
       <div class="logo-plus">+</div>
     </div>
   </header>
@@ -96,7 +98,7 @@
         <tr><th>Project / Machine ID</th><td contenteditable="true">&nbsp;</td></tr>
         <tr><th>Location</th><td contenteditable="true">&nbsp;</td></tr>
         <tr><th>Date</th><td contenteditable="true" id="today">&nbsp;</td></tr>
-        <tr><th>Installer</th><td>Patriot Electrical Limited</td></tr>
+        <tr><th>Installer</th><td contenteditable="true" id="companyName">Patriot Electrical Limited</td></tr>
         <tr><th>Client / Owner</th><td contenteditable="true">&nbsp;</td></tr>
         <tr><th>Client / Owner Address</th><td contenteditable="true">&nbsp;</td></tr>
       </table>
@@ -107,26 +109,26 @@
     <h3>Documents - Received from Client / Designer</h3>
     <div class="content">
       <ul class="checklist" id="docsClient">
-        <li><span class="cb" data-checked="true">✓</span> Connection / termination drawings</li>
-        <li><span class="cb" data-checked="false"></span> DSEAR zone drawings</li>
-        <li><span class="cb" data-checked="false"></span> Commissioning plan & test documentation</li>
-        <li><span class="cb" data-checked="false"></span> PUWER pre-use inspection records</li>
-        <li><span class="cb" data-checked="false"></span> Declaration of Conformity (UKCA / CE)</li>
-        <li><span class="cb" data-checked="false"></span> Operating & maintenance manuals</li>
-        <li><span class="cb" data-checked="false"></span> Technical file availability statement</li>
-        <li><span class="cb" data-checked="false"></span> Risk assessment documentation</li>
+        <li><div class="yes-no"><span>Yes</span><span class="cb" data-checked="true">✓</span><span>No</span><span class="cb" data-checked="false"></span></div><span>Connection / termination drawings</span></li>
+        <li><div class="yes-no"><span>Yes</span><span class="cb" data-checked="false"></span><span>No</span><span class="cb" data-checked="true">✓</span></div><span>DSEAR zone drawings</span></li>
+        <li><div class="yes-no"><span>Yes</span><span class="cb" data-checked="false"></span><span>No</span><span class="cb" data-checked="true">✓</span></div><span>Commissioning plan & test documentation</span></li>
+        <li><div class="yes-no"><span>Yes</span><span class="cb" data-checked="false"></span><span>No</span><span class="cb" data-checked="true">✓</span></div><span>PUWER pre-use inspection records</span></li>
+        <li><div class="yes-no"><span>Yes</span><span class="cb" data-checked="false"></span><span>No</span><span class="cb" data-checked="true">✓</span></div><span>Declaration of Conformity (UKCA / CE)</span></li>
+        <li><div class="yes-no"><span>Yes</span><span class="cb" data-checked="false"></span><span>No</span><span class="cb" data-checked="true">✓</span></div><span>Operating & maintenance manuals</span></li>
+        <li><div class="yes-no"><span>Yes</span><span class="cb" data-checked="false"></span><span>No</span><span class="cb" data-checked="true">✓</span></div><span>Technical file availability statement</span></li>
+        <li><div class="yes-no"><span>Yes</span><span class="cb" data-checked="false"></span><span>No</span><span class="cb" data-checked="true">✓</span></div><span>Risk assessment documentation</span></li>
         <li contenteditable="true" class="muted">Add other client-provided documents...</li>
       </ul>
     </div>
   </section>
 
   <section class="block">
-    <h3>Documents - Issued by Patriot Electrical Limited</h3>
+    <h3>Documents - Issued by <span class="company-name">Patriot Electrical Limited</span></h3>
     <div class="content">
       <ul class="checklist" id="docsPatriot">
-        <li><span class="cb" data-checked="true">✓</span> Electrical Installation Certificate - panel supply cable</li>
-        <li><span class="cb" data-checked="true">✓</span> This Handover & Limitation of Responsibility form</li>
-        <li><span class="cb" data-checked="false"></span> Other (specify): <span contenteditable="true" class="muted">Type here...</span></li>
+        <li><div class="yes-no"><span>Yes</span><span class="cb" data-checked="true">✓</span><span>No</span><span class="cb" data-checked="false"></span></div><span>Electrical Installation Certificate - panel supply cable</span></li>
+        <li><div class="yes-no"><span>Yes</span><span class="cb" data-checked="true">✓</span><span>No</span><span class="cb" data-checked="false"></span></div><span>This Handover & Limitation of Responsibility form</span></li>
+        <li><div class="yes-no"><span>Yes</span><span class="cb" data-checked="false"></span><span>No</span><span class="cb" data-checked="true">✓</span></div><span>Other (specify): <span contenteditable="true" class="muted">Type here...</span></span></li>
       </ul>
     </div>
   </section>
@@ -147,14 +149,14 @@
     <h3>Limitation of Liability & Scope of Work</h3>
     <div class="content">
       <div class="legal-box">
-        <strong>Patriot Electrical Limited's scope of work is strictly limited to:</strong>
+        <strong><span class="company-name">Patriot Electrical Limited</span>'s scope of work is strictly limited to:</strong>
         <ul class="clean">
           <li>Electrical connection and basic continuity testing only</li>
           <li>Compliance with BS 7671 for supply cable installation</li>
           <li>Provision of Electrical Installation Certificate for supply connection</li>
         </ul>
         
-        <strong>Patriot Electrical Limited expressly excludes all liability for:</strong>
+        <strong><span class="company-name">Patriot Electrical Limited</span> expressly excludes all liability for:</strong>
         <ul class="clean">
           <li>Machine commissioning, functional testing, and safety verification</li>
           <li>Compliance with machinery safety regulations (PUWER, DSEAR, etc.)</li>
@@ -200,7 +202,7 @@
         </div>
         <div class="acknowledgment">
           <span class="cb ack-cb" data-checked="false" id="ack3"></span>
-          <span>I/We agree to indemnify and hold harmless Patriot Electrical Limited from any claims, damages, or losses arising from machine operation or failure to complete required commissioning work.</span>
+          <span>I/We agree to indemnify and hold harmless <span class="company-name">Patriot Electrical Limited</span> from any claims, damages, or losses arising from machine operation or failure to complete required commissioning work.</span>
         </div>
         <div class="acknowledgment">
           <span class="cb ack-cb" data-checked="false" id="ack4"></span>
@@ -249,7 +251,7 @@
     </div>
   </section>
 
-  <div class="footer">Patriot Electrical Limited • Company No. 07303990 • James@PatriotElectricalLTD.com • 07525041141 • Version 2.0</div>
+  <div class="footer"><span class="company-name">Patriot Electrical Limited</span> • Company No. <span contenteditable="true" id="companyNumber">07303990</span> • <span contenteditable="true" id="companyEmail">James@PatriotElectricalLTD.com</span> • <span contenteditable="true" id="companyMobile">07525041141</span> • Version 2.0</div>
 </section>
 
 <button class="pdf-btn" id="pdfBtn">📄 Generate PDF</button>
@@ -357,10 +359,13 @@ function setupImageUpload(wrapperId, inputId, imgId) {
       
       // Wait for image to load to get dimensions
       img.onload = () => {
-        // Remove placeholder elements
+        // Remove placeholder elements - now handles both .plus and .logo-plus
         const plus = wrap.querySelector('.plus');
+        const logoPlus = wrap.querySelector('.logo-plus');
         const hint = wrap.querySelector('.hint');
+        
         if (plus) plus.remove();
+        if (logoPlus) logoPlus.remove();
         if (hint) hint.remove();
         
         // Show controls
@@ -486,7 +491,7 @@ setupImageUpload('projectPhotoWrap', 'projectPhotoInput', 'projectPhoto');
 // Setup logo upload
 setupImageUpload('logoWrap', 'logoInput', 'logo');
 
-// Checkbox handlers
+// Checkbox handlers for Yes/No format
 function wireChecklist(rootId){
   const root = document.getElementById(rootId);
   if (!root) return;
@@ -495,9 +500,22 @@ function wireChecklist(rootId){
     const cb = e.target.closest('.cb');
     if (!cb) return;
     
-    const state = cb.getAttribute('data-checked') === 'true';
-    cb.setAttribute('data-checked', String(!state));
-    cb.textContent = !state ? '✓' : '';
+    // Find the parent yes-no container
+    const yesNoContainer = cb.closest('.yes-no');
+    if (!yesNoContainer) return;
+    
+    // Find all checkboxes in this yes-no container
+    const allCbs = yesNoContainer.querySelectorAll('.cb');
+    
+    // Clear all checkboxes in this container first
+    allCbs.forEach(checkbox => {
+      checkbox.setAttribute('data-checked', 'false');
+      checkbox.textContent = '';
+    });
+    
+    // Set the clicked checkbox to checked
+    cb.setAttribute('data-checked', 'true');
+    cb.textContent = '✓';
   });
 }
 
@@ -553,9 +571,34 @@ document.getElementById('addObs').addEventListener('click', () => {
   });
 });
 
+// Company name synchronization
+document.getElementById('companyName').addEventListener('input', function(e) {
+  const newCompanyName = e.target.textContent.trim();
+  const companySpans = document.querySelectorAll('.company-name');
+  companySpans.forEach(span => {
+    span.textContent = newCompanyName || 'Patriot Electrical Limited';
+  });
+});
+
 // PDF Generation
 document.getElementById('pdfBtn').addEventListener('click', () => {
+  // Hide all image controls before printing
+  const allControls = document.querySelectorAll('.image-controls');
+  allControls.forEach(control => {
+    control.style.display = 'none';
+  });
+  
+  // Print
   window.print();
+  
+  // Restore controls after printing (with a small delay)
+  setTimeout(() => {
+    allControls.forEach(control => {
+      if (control.parentElement.querySelector('img').src) {
+        control.style.display = 'flex';
+      }
+    });
+  }, 1000);
 });
 </script>
 </body>
