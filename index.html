@@ -380,31 +380,25 @@
       display: none;
     }
 
+    .mobile-layout {
+      display: none;
+    }
+
     @media (max-width: 768px) {
       .data-table {
-        display: flex;
-        flex-direction: column;
+        display: none;
       }
       
-      .data-table tr {
-        display: contents;
-      }
-      
-      .data-table td {
+      .mobile-layout {
         display: block;
-        width: 100%;
-        padding: 1rem;
       }
       
-      /* Input cells - show first */
-      .data-table tr:nth-child(1) .input-cell { order: 1; }
-      .data-table tr:nth-child(2) .input-cell { order: 2; }
-      .data-table tr:nth-child(3) .input-cell { order: 3; }
-      
-      /* Output cells - show after */
-      .data-table tr:nth-child(1) .output-cell { order: 4; }
-      .data-table tr:nth-child(2) .output-cell { order: 5; }
-      .data-table tr:nth-child(3) .output-cell { order: 6; }
+      .mobile-item {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+      }
       
       .row-content {
         gap: 1rem;
@@ -509,6 +503,58 @@
           </td>
         </tr>
       </table>
+
+      <!-- Mobile Layout -->
+      <div class="mobile-layout">
+        <div class="mobile-item">
+          <div class="row-content">
+            <div class="big-label">LINE</div>
+            <select id="lineCSA-mobile" class="compact-input">
+              <option value="2.5" selected>2.5</option>
+              <option value="4">4.0</option>
+              <option value="6">6.0</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mobile-item">
+          <div class="row-content">
+            <div class="big-label">CPC</div>
+            <select id="cpcCSA-mobile" class="compact-input">
+              <option value="1.5" selected>1.5</option>
+              <option value="2.5">2.5</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mobile-item">
+          <div class="row-content">
+            <div class="big-label">TEMP</div>
+            <input type="number" id="temp-mobile" value="30" step="1" class="compact-input" />
+          </div>
+        </div>
+        
+        <div class="mobile-item">
+          <div class="row-content">
+            <div class="big-label">r2</div>
+            <div class="big-value" id="r2-mobile">0.00</div>
+          </div>
+        </div>
+        
+        <div class="mobile-item">
+          <div class="row-content">
+            <div class="big-label">R1+R2</div>
+            <div class="big-value" id="r1r2-mobile">0.00</div>
+          </div>
+        </div>
+        
+        <div class="mobile-item">
+          <div class="row-content">
+            <div class="big-label">Length</div>
+            <div class="big-value" id="cableLength-mobile">0</div>
+          </div>
+        </div>
+      </div>
 
       <div class="slider-container">
         <div class="slider-label">r1</div>
@@ -632,11 +678,24 @@
     const cpcCSA = $('#cpcCSA');
     const temp = $('#temp');
 
+    // Mobile elements
+    const lineCSAMobile = $('#lineCSA-mobile');
+    const cpcCSAMobile = $('#cpcCSA-mobile');
+    const tempMobile = $('#temp-mobile');
+    const r2DisplayMobile = $('#r2-mobile');
+    const r1r2DisplayMobile = $('#r1r2-mobile');
+    const cableLengthDisplayMobile = $('#cableLength-mobile');
+
     // Load saved values
     lineCSA.value = load('etools.lineCSA', '2.5');
     cpcCSA.value = load('etools.cpcCSA', '1.5');
     temp.value = load('etools.temp', 30);
     r1Slider.value = load('etools.r1', 0);
+
+    // Sync mobile values
+    lineCSAMobile.value = lineCSA.value;
+    cpcCSAMobile.value = cpcCSA.value;
+    tempMobile.value = temp.value;
 
     function updateRing() {
       const r1 = parseFloat(r1Slider.value);
@@ -650,15 +709,18 @@
       const mult = L / E;
       const r2 = r1 * mult;
       r2Display.textContent = r2.toFixed(2);
+      r2DisplayMobile.textContent = r2.toFixed(2);
       
       const r1r2 = (r1 + r2) / 4;
       r1r2Display.textContent = r1r2.toFixed(2);
+      r1r2DisplayMobile.textContent = r1r2.toFixed(2);
       
       const T = parseFloat(temp.value);
       const corr = 1 + ALPHA * (T - 20);
       const r1_at_20 = r1 / corr;
       const length_m = r1_at_20 / R_PER_M_20C[L];
       cableLengthDisplay.textContent = length_m.toFixed(0);
+      cableLengthDisplayMobile.textContent = length_m.toFixed(0);
       
       // Save values
       store('etools.lineCSA', lineCSA.value);
@@ -667,10 +729,29 @@
       store('etools.r1', r1);
     }
 
+    // Sync desktop and mobile inputs
+    function syncInputs() {
+      lineCSAMobile.value = lineCSA.value;
+      cpcCSAMobile.value = cpcCSA.value;
+      tempMobile.value = temp.value;
+    }
+
+    function syncFromMobile() {
+      lineCSA.value = lineCSAMobile.value;
+      cpcCSA.value = cpcCSAMobile.value;
+      temp.value = tempMobile.value;
+    }
+
     r1Slider.oninput = updateRing;
-    lineCSA.onchange = updateRing;
-    cpcCSA.onchange = updateRing;
-    temp.oninput = updateRing;
+    lineCSA.onchange = () => { syncInputs(); updateRing(); };
+    cpcCSA.onchange = () => { syncInputs(); updateRing(); };
+    temp.oninput = () => { syncInputs(); updateRing(); };
+
+    // Mobile input events
+    lineCSAMobile.onchange = () => { syncFromMobile(); updateRing(); };
+    cpcCSAMobile.onchange = () => { syncFromMobile(); updateRing(); };
+    tempMobile.oninput = () => { syncFromMobile(); updateRing(); };
+    
     updateRing();
 
     // Max Zs calculations
