@@ -1,265 +1,386 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Electrician Tools</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #ffffff;
-            color: #000000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        nav {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #e0e0e0;
-            padding: 0;
-            width: 100%;
-            border: none;
-            box-shadow: none;
-            margin-bottom: 0;
-        }
-        nav button {
-            background-color: #f0f0f0;
-            border: none;
-            outline: none;
-            border-radius: 12px 12px 0 0;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            font-weight: bold;
-            margin: 0 0.25rem;
-            cursor: pointer;
-            color: #333;
-            box-shadow: none;
-            border-bottom: 4px solid transparent;
-        }
-        nav button.active {
-            background-color: #ffffff;
-            box-shadow: none;
-            border-bottom: 4px solid #ffffff;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Electrician Tools (v02)</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #000000;
+      --muted: #e0e0e0;
+      --card: #f5f5f5;
+      --accent: #121212;
+    }
+    body.dark-mode {
+      --bg: #121212;
+      --fg: #ffffff;
+      --muted: #2c2c2c;
+      --card: #1e1e1e;
+      --accent: #222222;
+    }
 
-        body.dark-mode nav button.active {
-            background-color: #121212 !important;
-            border-bottom: 4px solid #121212 !important;
-            color: #ffffff;
-        }
-        .section {
-            display: none;
-            padding: 2rem;
-            width: 100%;
-            max-width: 600px;
-        }
-        .section.active {
-            display: block;
-        }
-        .card {
-            background-color: #f5f5f5;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-        .slider-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 1rem;
-        }
-        input[type=range] {
-            width: 300px;
-        }
-        .bold-text {
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 1rem;
-            gap: 10px;
-        }
-        .toggle-button {
-            display: inline-block;
-            background-color: #ccc;
-            border-radius: 15px;
-            width: 60px;
-            height: 30px;
-            position: relative;
-            cursor: pointer;
-        }
-        .toggle-button:before {
-            content: '';
-            position: absolute;
-            width: 26px;
-            height: 26px;
-            background-color: #000;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: 0.3s;
-        }
-        .toggle-active:before {
-            left: 32px;
-        }
-    </style>
+    html, body { height: 100%; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: var(--bg);
+      color: var(--fg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background-color .25s, color .25s;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--muted);
+      padding: 0;
+      width: 100%;
+      border: none;
+      box-shadow: none;
+      margin-bottom: 0;
+      gap: .25rem;
+    }
+    nav button {
+      background-color: #f0f0f0;
+      border: none;
+      outline: none;
+      border-radius: 12px 12px 0 0;
+      padding: .75rem 1.25rem;
+      font-size: 1rem;
+      font-weight: bold;
+      margin: 0 .125rem;
+      cursor: pointer;
+      color: #333;
+      box-shadow: none;
+      border-bottom: 4px solid transparent;
+      transition: background-color .2s;
+    }
+    nav button.active { background-color: var(--bg); border-bottom: 4px solid var(--bg); color: var(--fg); }
+
+    .section { display: none; padding: 2rem; width: 100%; max-width: 720px; }
+    .section.active { display: block; }
+
+    .card {
+      background-color: var(--card);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 10px rgba(0,0,0,.08);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .row { display: flex; flex-wrap: wrap; gap: .75rem 1rem; align-items: center; }
+    .row > * { flex: 0 1 auto; }
+    .spacer { flex: 1 1 auto; }
+
+    .field { display: grid; grid-template-columns: auto auto; gap: .5rem 1rem; align-items: center; }
+    .field label { opacity: .85; }
+    .field input[type="number"], .field select, .field input[type="text"] {
+      padding: .4rem .55rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: var(--bg);
+      color: var(--fg);
+      min-width: 90px;
+    }
+
+    .slider { display: grid; grid-template-columns: 60px 1fr 70px; gap: .75rem; align-items: center; }
+    input[type=range] { width: 100%; }
+
+    .bold-text { font-weight: bold; font-size: 1.05rem; }
+
+    .toggle-button {
+      display: inline-block; background-color: #ccc; border-radius: 15px; width: 60px; height: 30px; position: relative; cursor: pointer;
+    }
+    .toggle-button:before {
+      content: ""; position: absolute; width: 26px; height: 26px; background-color: #000; border-radius: 50%; top: 2px; left: 2px; transition: .25s;
+    }
+    .toggle-active:before { left: 32px; }
+
+    details { background: var(--card); padding: .75rem 1rem; border-radius: 10px; }
+    details summary { cursor: pointer; font-weight: 600; }
+    textarea { width: 100%; min-height: 180px; padding: .75rem; border-radius: 10px; border: 1px solid #999; background: var(--bg); color: var(--fg); }
+
+    .muted { opacity: .8; }
+    .unit { opacity: .9; }
+  </style>
 </head>
 <body>
-<nav>
-    <button id="tabRing" class="active" onclick="showTab('ring')">Ring Continuity</button>
-    <button id="tabZs" onclick="showTab('zs')">Max Zs</button>
-    <div class="toggle-container" style="margin-left: auto; margin-right: 1rem; display: flex; align-items: center;">
-        <div id="darkModeToggle" class="toggle-button" onclick="toggleDarkMode()"></div>
-        <span style="font-size: 0.9rem;">Dark</span>
+  <nav>
+    <button id="tabRing" class="active" data-tab="ring">Ring Continuity</button>
+    <button id="tabZs" data-tab="zs">Max Zs</button>
+    <div class="spacer"></div>
+    <div class="row" style="padding-right: 1rem; align-items:center;">
+      <div id="darkModeToggle" class="toggle-button" title="Dark mode"></div>
+      <span style="font-size:.9rem">Dark</span>
     </div>
-</nav>
+  </nav>
 
-<div id="ring" class="section active">
+  <!-- Ring continuity -->
+  <div id="ring" class="section active">
     <div class="card">
-        <h1>Ring Continuity Checker</h1>
-        <div class="toggle-container">
-            <span>2.5mm²</span>
-            <div id="cableToggle" class="toggle-button"></div>
-            <span>4mm²</span>
-        </div>
-        <p>Expected r2 Reading: <span id="r2" class="bold-text">0.00</span> &Omega;</p>
-        <p>Expected R1R2 Value: <span id="r1r2" class="bold-text">0.00</span> &Omega;</p>
-        <p>Estimated Cable Length (Copper <span id="cableSize">2.5mm²</span>): <span id="cableLength">0.00</span> meters</p>
-        <div class="slider-container">
-            <span class="bold-text">r1</span>
-            <span id="r1Value" class="bold-text">0.00</span> &Omega;
-            <input type="range" id="r1Slider" min="0" max="2" step="0.01" value="0">
-        </div>
-    </div>
-</div>
+      <h1 style="margin:0">Ring Continuity Checker</h1>
+      <p class="muted" style="margin-top:-.5rem">Assumes standard r1-rn-r2 cross-connection tests (R<sub>1</sub>, R<sub>n</sub>, R<sub>2</sub>; R<sub>1</sub>+R<sub>2</sub> ≈ (r1+r2)/4 at mid‑point).</p>
 
-<div id="zs" class="section">
+      <div class="row">
+        <div class="field">
+          <label for="lineCSA">Line conductor CSA (mm²)</label>
+          <select id="lineCSA">
+            <option value="2.5">2.5</option>
+            <option value="4">4.0</option>
+            <option value="6">6.0</option>
+          </select>
+
+          <label for="cpcCSA">CPC CSA (mm²)</label>
+          <select id="cpcCSA">
+            <option value="1.5">1.5</option>
+            <option value="2.5">2.5</option>
+          </select>
+
+          <label for="temp">Measured cable temp (°C)</label>
+          <input type="number" id="temp" value="20" step="1" />
+
+          <label for="r1Input">Measured r1 (Ω)</label>
+          <input type="number" id="r1Input" value="0.00" step="0.01" />
+        </div>
+      </div>
+
+      <div class="slider">
+        <span class="bold-text">r1</span>
+        <input type="range" id="r1Slider" min="0" max="2" step="0.01" value="0" />
+        <div><span id="r1Value" class="bold-text">0.00</span> <span class="unit">Ω</span></div>
+      </div>
+
+      <div class="row" style="margin-top:.5rem">
+        <div class="field">
+          <label>Expected r2 (Ω)</label>
+          <div><span id="r2" class="bold-text">0.00</span> <span class="unit">Ω</span></div>
+
+          <label>Expected R1+R2 at mid‑point (Ω)</label>
+          <div><span id="r1r2" class="bold-text">0.00</span> <span class="unit">Ω</span></div>
+
+          <label>Estimated ring half‑length (m)</label>
+          <div><span id="cableLength" class="bold-text">0.00</span> <span class="unit">m</span></div>
+        </div>
+      </div>
+
+      <details>
+        <summary>Method & notes</summary>
+        <ul>
+          <li>Multiplier r2/r1 = Line_CSA ÷ CPC_CSA. For 2.5/1.5 it's 1.67. For 4.0/1.5 it's 2.67. For 4.0/2.5 it's 1.60.</li>
+          <li>Resistance/ metre @20°C used: 1.0→0.0181Ω/m, 1.5→0.0121Ω/m, 2.5→0.00741Ω/m, 4.0→0.00461Ω/m, 6.0→0.00308Ω/m.</li>
+          <li>Temperature correction: R(T) = R(20°C)×[1 + 0.00393×(T−20)].</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <!-- Max Zs -->
+  <div id="zs" class="section">
     <div class="card">
-        <h1>Max Zs 80%</h1>
-        <h2 id="result">Max Zs 80%: -- Ω</h2>
-        <label for="type">MCB Type:</label>
-        <input type="range" id="type" min="0" max="2" step="1" value="0">
-        <span id="typeValue">Type: B</span>
-        <br><br>
-        <label for="amps">Current Rating (Amps):</label>
-        <input type="range" id="amps" min="0" max="7" step="1" value="0">
-        <span id="ampsValue">Amps: 6</span>
+      <h1 style="margin:0">Max Zs (80%)</h1>
+      <p class="muted" style="margin-top:-.5rem">Quick look‑up. You can edit the table below to suit your amendment/version.</p>
+
+      <div class="row">
+        <div class="field">
+          <label for="mcbType">MCB Type</label>
+          <select id="mcbType">
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+          </select>
+
+          <label for="mcbAmps">Rating (A)</label>
+          <select id="mcbAmps">
+            <option>6</option>
+            <option>10</option>
+            <option>16</option>
+            <option>20</option>
+            <option>25</option>
+            <option>32</option>
+            <option>40</option>
+            <option>45</option>
+          </select>
+        </div>
+        <div class="spacer"></div>
+        <div class="field">
+          <label>Result</label>
+          <div id="zsResult" class="bold-text">-- Ω</div>
+          <label for="eightyToggle">Apply 80% factor</label>
+          <div><input id="eightyToggle" type="checkbox" checked /></div>
+        </div>
+      </div>
+
+      <details>
+        <summary>Show/Edit table (JSON)</summary>
+        <p class="muted">These are your current values. Update and click <em>Save</em>. (Stored locally.)</p>
+        <textarea id="zsJSON"></textarea>
+        <div class="row">
+          <button id="saveZs">Save</button>
+          <button id="resetZs">Reset to defaults</button>
+        </div>
+      </details>
     </div>
-</div>
+  </div>
 
-<script>
-    let multiplier = 1.67;
-    let cableResistance = 0.00741;
-    let is4mm = false;
+  <script>
+    // ===== Utilities & persistence =====
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => Array.from(document.querySelectorAll(s));
+    const store = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+    const load = (k, d) => {
+      try { const v = JSON.parse(localStorage.getItem(k)); return (v === null || v === undefined) ? d : v; } catch { return d; }
+    };
 
-    const r1Slider = document.getElementById("r1Slider");
-    const r1Value = document.getElementById("r1Value");
-    const r2Display = document.getElementById("r2");
-    const r1r2Display = document.getElementById("r1r2");
-    const cableLengthDisplay = document.getElementById("cableLength");
-    const cableToggle = document.getElementById("cableToggle");
-    const cableSizeDisplay = document.getElementById("cableSize");
-    const typeSlider = document.getElementById("type");
-    const ampsSlider = document.getElementById("amps");
-    const typeValue = document.getElementById("typeValue");
-    const ampsValue = document.getElementById("ampsValue");
-    const resultDisplay = document.getElementById("result");
+    // ===== Dark mode & tabs =====
+    const dmToggle = $('#darkModeToggle');
+    const preferDark = load('etools.dark', false);
+    if (preferDark) document.body.classList.add('dark-mode');
+    if (preferDark) dmToggle.classList.add('toggle-active');
 
-    function updateValues() {
-        let r1 = parseFloat(r1Slider.value);
-        let r2 = (r1 * multiplier).toFixed(2);
-        let r1r2 = ((r1 + parseFloat(r2)) / 4).toFixed(2);
-        let cableLength = (r1 / cableResistance).toFixed(2);
-        r1Value.textContent = r1.toFixed(2);
-        r2Display.textContent = r2;
-        r1r2Display.textContent = r1r2;
-        cableLengthDisplay.textContent = cableLength;
+    function applyNavButtonStyles() {
+      $$('#nav button');
+      $$('#nav button');
+      $$('.active').forEach(()=>{}); // placeholder to avoid unused warnings
+      // Buttons inherit via CSS vars now; no inline tweaks needed.
     }
 
-    function updateZs() {
-        const zsValues = {
-            "B": {6: 5.83, 10: 3.50, 16: 2.19, 20: 1.75, 25: 1.40, 32: 1.10, 40: 0.88, 45: 0.78},
-            "C": {6: 2.92, 10: 1.75, 16: 1.10, 20: 0.88, 25: 0.70, 32: 0.55, 40: 0.44, 45: 0.39},
-            "D": {6: 1.46, 10: 0.88, 16: 0.55, 20: 0.44, 25: 0.35, 32: 0.28, 40: 0.22, 45: 0.09}
-        };
-        const types = ["B", "C", "D"];
-        let type = types[typeSlider.value];
-        let amps = [6, 10, 16, 20, 25, 32, 40, 45][ampsSlider.value];
-        let zs = zsValues[type][amps] || 0;
-        resultDisplay.textContent = `Max Zs (80%): ${zs.toFixed(2)} Ω`;
-        typeValue.textContent = `Type: ${type}`;
-        ampsValue.textContent = `Amps: ${amps}`;
+    dmToggle.addEventListener('click', () => {
+      const isDark = document.body.classList.toggle('dark-mode');
+      dmToggle.classList.toggle('toggle-active');
+      store('etools.dark', isDark);
+    });
+
+    const lastTab = load('etools.tab', 'ring');
+    function showTab(tabId){
+      $$('#ring, #zs').forEach(el=>el.classList.remove('active'));
+      $$('#tabRing, #tabZs').forEach(el=>el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      document.getElementById(tabId === 'ring' ? 'tabRing' : 'tabZs').classList.add('active');
+      store('etools.tab', tabId);
+    }
+    $('#tabRing').addEventListener('click', ()=>showTab('ring'));
+    $('#tabZs').addEventListener('click', ()=>showTab('zs'));
+
+    // ===== Ring continuity logic =====
+    const R_PER_M_20C = { 1.0: 0.0181, 1.5: 0.0121, 2.5: 0.00741, 4: 0.00461, 6: 0.00308 };
+    const ALPHA = 0.00393; // per °C for copper
+
+    const r1Slider = $('#r1Slider');
+    const r1Input  = $('#r1Input');
+    const r1Value  = $('#r1Value');
+    const r2Display = $('#r2');
+    const r1r2Display = $('#r1r2');
+    const cableLengthDisplay = $('#cableLength');
+
+    const lineCSA = $('#lineCSA');
+    const cpcCSA  = $('#cpcCSA');
+    const temp    = $('#temp');
+
+    // load persisted
+    lineCSA.value = load('etools.lineCSA', '2.5');
+    cpcCSA.value  = load('etools.cpcCSA',  '1.5');
+    temp.value    = load('etools.temp', 20);
+    const savedR1 = load('etools.r1', 0);
+    r1Slider.value = savedR1;
+    r1Input.value  = Number(savedR1).toFixed(2);
+
+    function updateRing(){
+      const r1 = parseFloat(r1Slider.value);
+      r1Value.textContent = r1.toFixed(2);
+      r1Input.value = r1.toFixed(2);
+
+      const L = parseFloat(lineCSA.value);
+      const E = parseFloat(cpcCSA.value);
+      if (!R_PER_M_20C[L] || !R_PER_M_20C[E]) return;
+
+      // multiplier r2/r1 = L/E (CSA ratio)
+      const multiplier = L / E; // e.g., 2.5/1.5 ≈ 1.667; 4/1.5 ≈ 2.667
+      const r2 = r1 * multiplier;
+      r2Display.textContent = r2.toFixed(2);
+
+      // R1+R2 at the mid-point reading ≈ (r1 + r2)/4
+      const r1r2 = (r1 + r2) / 4;
+      r1r2Display.textContent = r1r2.toFixed(2);
+
+      // Estimate half-length from r1 (line only). Use temp correction back to 20°C equivalent, then divide by Ω/m.
+      const T = parseFloat(temp.value);
+      const corr = 1 + ALPHA * (T - 20);
+      const r1_at_20 = r1 / corr;
+      const ohm_per_m = R_PER_M_20C[L];
+      const length_m = r1_at_20 / ohm_per_m; // half of the ring (one leg)
+      cableLengthDisplay.textContent = length_m.toFixed(2);
+
+      // persist
+      store('etools.lineCSA', lineCSA.value);
+      store('etools.cpcCSA', cpcCSA.value);
+      store('etools.temp', temp.value);
+      store('etools.r1', r1);
     }
 
-    function toggleCableType() {
-        is4mm = !is4mm;
-        multiplier = is4mm ? 2.5 : 1.67;
-        cableResistance = is4mm ? 0.00463 : 0.00741;
-        cableSizeDisplay.textContent = is4mm ? "4mm²" : "2.5mm²";
-        cableToggle.classList.toggle("toggle-active");
-        updateValues();
+    r1Slider.addEventListener('input', updateRing);
+    r1Input.addEventListener('change', (e)=>{ const v = Number(e.target.value)||0; r1Slider.value = v; updateRing(); });
+    lineCSA.addEventListener('change', updateRing);
+    cpcCSA.addEventListener('change', updateRing);
+    temp.addEventListener('input', updateRing);
+
+    // ===== Max Zs logic =====
+    const defaultZs = {
+      "B": {"6": 5.83, "10": 3.50, "16": 2.19, "20": 1.75, "25": 1.40, "32": 1.10, "40": 0.88, "45": 0.78},
+      "C": {"6": 2.92, "10": 1.75, "16": 1.10, "20": 0.88, "25": 0.70, "32": 0.55, "40": 0.44, "45": 0.39},
+      "D": {"6": 1.46, "10": 0.88, "16": 0.55, "20": 0.44, "25": 0.35, "32": 0.28, "40": 0.22, "45": 0.09}
+    };
+
+    const zsTable = load('etools.zsTable', defaultZs);
+    const mcbType = $('#mcbType');
+    const mcbAmps = $('#mcbAmps');
+    const zsResult = $('#zsResult');
+    const eightyToggle = $('#eightyToggle');
+    const zsJSON = $('#zsJSON');
+
+    // populate JSON editor
+    zsJSON.value = JSON.stringify(zsTable, null, 2);
+
+    function updateZs(){
+      const t = mcbType.value; const a = mcbAmps.value;
+      const base = (zsTable?.[t]?.[a]) ?? null;
+      if (base == null) { zsResult.textContent = '— not in table —'; return; }
+      const out = eightyToggle.checked ? base : (base / 0.8);
+      zsResult.textContent = (out).toFixed(2) + ' Ω';
+      store('etools.mcbType', t);
+      store('etools.mcbAmps', a);
+      store('etools.eighty', eightyToggle.checked);
     }
 
-    function toggleDarkMode() {
-        const body = document.body;
-        const toggle = document.getElementById("darkModeToggle");
-        const isDark = body.classList.toggle("dark-mode");
-        toggle.classList.toggle("toggle-active");
+    // load persisted selections
+    mcbType.value = load('etools.mcbType', 'B');
+    mcbAmps.value = load('etools.mcbAmps', '6');
+    eightyToggle.checked = load('etools.eighty', true);
 
-        const navButtons = document.querySelectorAll('nav button');
-        navButtons.forEach(el => el.style.backgroundColor = isDark ? '#444' : '#f0f0f0');
-        document.querySelectorAll('nav button.active').forEach(el => el.style.backgroundColor = isDark ? '#222' : '#ffffff');
+    mcbType.addEventListener('change', updateZs);
+    mcbAmps.addEventListener('change', updateZs);
+    eightyToggle.addEventListener('change', updateZs);
 
-        if (isDark) {
-            body.style.backgroundColor = '#121212';
-            body.style.color = '#ffffff';
-            document.querySelectorAll('.card').forEach(el => el.style.backgroundColor = '#1e1e1e');
-            document.querySelectorAll('nav').forEach(el => el.style.backgroundColor = '#2c2c2c');
-        } else {
-            body.style.backgroundColor = '#ffffff';
-            body.style.color = '#000000';
-            document.querySelectorAll('.card').forEach(el => el.style.backgroundColor = '#f5f5f5');
-            document.querySelectorAll('nav').forEach(el => el.style.backgroundColor = '#e0e0e0');
-        }
-    }
+    $('#saveZs').addEventListener('click', () => {
+      try {
+        const obj = JSON.parse(zsJSON.value);
+        store('etools.zsTable', obj);
+        location.reload();
+      } catch (e) { alert('Invalid JSON'); }
+    });
+    $('#resetZs').addEventListener('click', () => {
+      store('etools.zsTable', defaultZs);
+      location.reload();
+    });
 
-    function showTab(tab) {
-        document.getElementById("ring").classList.remove("active");
-        document.getElementById("zs").classList.remove("active");
-        document.getElementById("tabRing").classList.remove("active");
-        document.getElementById("tabZs").classList.remove("active");
-
-        document.getElementById(tab).classList.add("active");
-        if (tab === "ring") {
-            document.getElementById("tabRing").classList.add("active");
-        } else if (tab === "zs") {
-            document.getElementById("tabZs").classList.add("active");
-        }
-
-        const isDark = document.body.classList.contains("dark-mode");
-        document.querySelectorAll('nav button').forEach(el => el.style.backgroundColor = isDark ? '#444' : '#f0f0f0');
-        document.querySelectorAll('nav button.active').forEach(el => el.style.backgroundColor = isDark ? '#222' : '#ffffff');
-    }
-
-    r1Slider.addEventListener("input", updateValues);
-    cableToggle.addEventListener("click", toggleCableType);
-    typeSlider.addEventListener("input", updateZs);
-    ampsSlider.addEventListener("input", updateZs);
-
-    updateValues();
+    // ===== Init =====
+    showTab(lastTab);
+    updateRing();
     updateZs();
-</script>
+  </script>
 </body>
 </html>
