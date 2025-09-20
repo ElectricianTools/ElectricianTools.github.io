@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Electrician Tools</title>
   <style>
-    :root{ --fg:#0f0; --bg:#000; --line:#0f0; --box-h:1.8em; }
+    :root{ --fg:#0f0; --bg:#000; --line:#0f0; --box-h:1.8em; --hit-bg:#00ff6a; --hit-fg:#000; }
     body { margin:0; padding:0; font-family:monospace; background:var(--bg); color:var(--fg); }
     nav { background:var(--bg); border-bottom:1px solid var(--line); display:flex; gap:1rem; padding:.5rem; }
     nav button { background:transparent; border:1px solid var(--line); color:var(--fg); padding:.25rem .5rem; cursor:pointer; }
@@ -27,9 +27,21 @@
 
     .result-box { border:1px solid #0f0; background:#000; padding:0 .5rem; min-width:6ch; text-align:left; font-family:monospace; color:#0f0; height:var(--box-h); display:flex; align-items:center; box-sizing:border-box; font-size:0.8rem; }
 
-    .r1-bar{ position:relative; width:320px; height:var(--box-h); border:1px solid #0f0; background:#000; user-select:none; display:flex; align-items:center; }
+    /* Drag bars */
+    .r1-bar{ position:relative; width:200px; height:1.6em; border:1px solid #0f0; background:#000; user-select:none; display:flex; align-items:center; touch-action:none; cursor:ew-resize; }
     .r1-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:#00ff6a; }
-    .r1-text{ position:absolute; left:8px; font-weight:700; color:#000; pointer-events:none; z-index:2; font-size:0.8rem; transition:color 0.2s; }
+    .r1-text{ position:absolute; left:8px; font:700 0.8rem monospace; color:#0f0; pointer-events:none; z-index:2; transition:color .15s; }
+
+    /* === Max Zs (matrix) styles === */
+    .controls{padding:10px 16px;display:flex;flex-direction:column;gap:6px}
+    .control{display:flex;flex-direction:column;gap:2px}
+    .wrap{padding:10px 16px;display:flex;flex-direction:column;align-items:flex-start}
+    .matrix-wrap{width:200px}
+    table{width:100%;border-collapse:collapse;background:#000;color:var(--fg);font-variant-numeric:tabular-nums;font-size:12px;table-layout:fixed}
+    th,td{border:1px solid #0f0;padding:2px;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+    thead th{background:#000;color:var(--fg)}
+    tbody th{background:#000;color:var(--fg);text-align:left;padding-left:2px;width:35px}
+    .hit{background:#00ff6a;color:#000!important}
   </style>
 </head>
 <body>
@@ -38,6 +50,7 @@
     <button id="tabZs" data-tab="zs">Max Zs</button>
   </nav>
 
+  <!-- ===== RING TAB ===== -->
   <div id="ring" class="section active">
     <h1 id="ringTitle">Ring Continuity Checker</h1>
     <div class="inputs-row">
@@ -83,18 +96,28 @@
     </div>
   </div>
 
+  <!-- ===== MAX Zs TAB ===== -->
   <div id="zs" class="section">
-    <h1>Max Zs (80%)</h1>
-    <select id="mcbType"><option>B</option><option>C</option><option>D</option></select>
-    <select id="mcbAmps"><option>6</option><option>10</option><option>16</option><option>20</option><option>25</option><option>32</option><option>40</option><option>45</option></select>
-    <div class="result">Zs: <span id="zsResult">-- Ω</span></div>
-    <label><input id="eightyToggle" type="checkbox" checked /> 80% factor</label>
-    <details>
-      <summary>Show/Edit table</summary>
-      <textarea id="zsJSON"></textarea>
-      <button id="saveZs">Save</button>
-      <button id="resetZs">Reset</button>
-    </details>
+    <div style="padding:10px 16px">
+      <h1>MAX Zs</h1>
+      <h2 style="margin:0 0 6px 0;font-size:12px;color:var(--fg);font-weight:normal">Device BS EN 60898 / 61009</h2>
+    </div>
+    <div class="controls">
+      <div class="control" id="typeCtrl">
+        <div class="r1-bar" id="typeBar"><div class="r1-fill" id="typeFill"></div><div class="r1-text" id="typeText">B</div></div>
+      </div>
+      <div class="control" id="ampCtrl">
+        <div class="r1-bar" id="ampBar"><div class="r1-fill" id="ampFill"></div><div class="r1-text" id="ampText">32A</div></div>
+      </div>
+      <div class="control" id="pctCtrl">
+        <div class="r1-bar" id="pctBar"><div class="r1-fill" id="pctFill"></div><div class="r1-text" id="pctText">80%</div></div>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="matrix-wrap">
+        <table id="matrix"></table>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -103,6 +126,7 @@
     const store = (k, v) => localStorage.setItem(k, JSON.stringify(v));
     const load = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
 
+    // ===== Tabs =====
     const lastTab = load('tab','ring');
     function showTab(id){
       $$('#ring,#zs').forEach(x=>x.classList.remove('active'));
@@ -115,8 +139,9 @@
     $('#tabZs').onclick=()=>showTab('zs');
     showTab(lastTab);
 
+    // ===== Ring calc =====
     const R_PER_M_20C = { 1.0:0.0181, 1.5:0.0121, 2.5:0.00741, 4.0:0.00461, 6.0:0.00308 };
-    const ALPHA = 0.00393;
+    const ALPHA = 0.00393; // copper temp coeff
     const maxR1 = 2.00;
 
     const lineCSA = $('#lineCSA');
@@ -131,7 +156,6 @@
     const r1Text = $('#r1Text');
 
     let r1 = load('ring.r1', 0);
-    let dragging = false;
 
     function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
 
@@ -140,34 +164,33 @@
       const pct = (r1 / maxR1) * 100;
       r1Fill.style.width = pct.toFixed(2) + '%';
       r1Text.textContent = r1.toFixed(2) + ' Ω';
-
-      // Measure only the number width, ignore the trailing unit symbol
-      const digitsWidth = r1Text.textContent.split(' ')[0].length * 8; // approx 8px per char
-      const textPos = r1Text.offsetLeft + digitsWidth;
+      // Colour swap using only the number width (ignore Ω)
+      const digitsWidth = r1Text.textContent.split(' ')[0].length * 8; // ≈8px/char mono
+      const firstDigitRight = r1Text.offsetLeft + digitsWidth;
       const fillWidth = r1Fill.offsetWidth;
-
-      if(fillWidth < textPos){
-        r1Text.style.color = '#0f0';
-      } else {
-        r1Text.style.color = '#000';
-      }
-
+      r1Text.style.color = (fillWidth < firstDigitRight) ? '#0f0' : '#000';
       r1Bar.setAttribute('aria-valuenow', r1.toFixed(2));
       store('ring.r1', r1);
       updateRing();
     }
 
+    // Smooth, mobile-friendly dragging for R1
+    let dragging=false, r1Rect=null, lastX=0, rafPending=false;
     function posToR1(clientX){
-      const rect = r1Bar.getBoundingClientRect();
+      const rect = r1Rect || r1Bar.getBoundingClientRect();
       const x = clamp(clientX - rect.left, 0, rect.width);
-      const ratio = x / rect.width;
-      return ratio * maxR1;
+      return (x / rect.width) * maxR1;
     }
-
-    r1Bar.addEventListener('pointerdown', (e)=>{ dragging = true; r1Bar.setPointerCapture(e.pointerId); setR1(posToR1(e.clientX)); });
-    r1Bar.addEventListener('pointermove', (e)=>{ if(!dragging) return; setR1(posToR1(e.clientX)); });
-    r1Bar.addEventListener('pointerup',   (e)=>{ dragging = false; r1Bar.releasePointerCapture(e.pointerId); });
-    r1Bar.addEventListener('pointercancel', ()=> dragging = false);
+    r1Bar.addEventListener('pointerdown', (e)=>{
+      e.preventDefault(); dragging=true; r1Rect=r1Bar.getBoundingClientRect(); lastX=e.clientX;
+      r1Bar.setPointerCapture(e.pointerId); setR1(posToR1(lastX));
+    }, {passive:false});
+    r1Bar.addEventListener('pointermove', (e)=>{
+      if(!dragging) return; e.preventDefault(); lastX=e.clientX;
+      if(!rafPending){ rafPending=true; requestAnimationFrame(()=>{ setR1(posToR1(lastX)); rafPending=false; }); }
+    }, {passive:false});
+    function endR1(e){ dragging=false; r1Rect=null; try{ r1Bar.releasePointerCapture(e.pointerId); }catch{} }
+    r1Bar.addEventListener('pointerup', endR1); r1Bar.addEventListener('pointercancel', endR1); r1Bar.addEventListener('pointerleave', (e)=>{ if(dragging) endR1(e); });
 
     function updateRing(){
       const L = parseFloat(lineCSA.value);
@@ -175,22 +198,18 @@
       const T = parseFloat(temp.value) || 30;
       const ohmPerM = R_PER_M_20C[L];
       if(!ohmPerM || !R_PER_M_20C[E]){ r2Out.textContent='--'; r1r2Out.textContent='--'; lenOut.textContent='--'; return; }
-
       const r2 = r1 * (L / E);
       const r1r2 = (r1 + r2) / 4;
       const corr = 1 + ALPHA * (T - 20);
-      const r1_20 = r1 / corr;
-      const halfLen = r1_20 / ohmPerM;
-
+      const r1_20 = r1 / corr; // adjust to 20°C
+      const halfLen = r1_20 / ohmPerM; // per leg length
       r2Out.textContent = r2.toFixed(2) + ' Ω';
       r1r2Out.textContent = r1r2.toFixed(2) + ' Ω';
       lenOut.textContent = Math.round(halfLen) + ' m';
-
-      store('ring.lineCSA', L);
-      store('ring.cpcCSA', E);
-      store('ring.temp', T);
+      store('ring.lineCSA', L); store('ring.cpcCSA', E); store('ring.temp', T);
     }
 
+    // init ring
     lineCSA.value = load('ring.lineCSA', '2.5');
     cpcCSA.value  = load('ring.cpcCSA',  '1.0');
     temp.value    = load('ring.temp', 30);
@@ -199,41 +218,124 @@
     cpcCSA.addEventListener('change', updateRing);
     temp.addEventListener('input', updateRing);
 
-    const defaultZs = {
-      "B": {"6":5.83, "10":3.50, "16":2.19, "20":1.75, "25":1.40, "32":1.10, "40":0.88, "45":0.78},
-      "C": {"6":2.92, "10":1.75, "16":1.10, "20":0.88, "25":0.70, "32":0.55, "40":0.44, "45":0.39},
-      "D": {"6":1.46, "10":0.88, "16":0.55, "20":0.44, "25":0.35, "32":0.28, "40":0.22, "45":0.19}
+    // ===== Max Zs matrix =====
+    const RATINGS=[6,10,16,20,25,32,40,50,63];
+    const TYPES=['B','C','D'];
+    const DATA_100={
+      B:{6:7.28,10:4.37,16:2.73,20:2.19,25:1.75,32:1.37,40:1.09,50:0.87,63:0.69},
+      C:{6:3.64,10:2.19,16:1.37,20:1.09,25:0.87,32:0.68,40:0.55,50:0.44,63:0.35},
+      D:{6:1.82,10:1.09,16:0.68,20:0.55,25:0.44,32:0.34,40:0.27,50:0.22,63:0.17}
     };
-    const zsTable = load('zs.table', defaultZs);
-    const mcbType = $('#mcbType');
-    const mcbAmps = $('#mcbAmps');
-    const zsResult = $('#zsResult');
-    const eightyToggle = $('#eightyToggle');
-    const zsJSON = $('#zsJSON');
 
-    zsJSON.value = JSON.stringify(zsTable, null, 2);
+    let selType='B', selAmp=32, pct=80; // pct 80 or 100
 
-    function updateZs(){
-      const t = mcbType.value; const a = mcbAmps.value;
-      const base = zsTable?.[t]?.[a];
-      if(base == null){ zsResult.textContent = '-- Ω'; return; }
-      const out = eightyToggle.checked ? base : (base/0.8);
-      zsResult.textContent = out.toFixed(2) + ' Ω';
-      store('zs.type', t); store('zs.amps', a); store('zs.80', eightyToggle.checked);
+    const els={
+      matrix:document.getElementById('matrix'),
+      typeBar:document.getElementById('typeBar'), typeFill:document.getElementById('typeFill'), typeText:document.getElementById('typeText'),
+      ampBar:document.getElementById('ampBar'), ampFill:document.getElementById('ampFill'), ampText:document.getElementById('ampText'),
+      pctBar:document.getElementById('pctBar'), pctFill:document.getElementById('pctFill'), pctText:document.getElementById('pctText')
+    };
+
+    function fmt(x){return (Math.round(x*100)/100).toFixed(2).replace(/\.00$/,'');}
+
+    function buildTable(){
+      let html='<thead><tr><th>A</th>'+TYPES.map(T=>`<th>${T}</th>`).join('')+'</tr></thead>';
+      html+='<tbody>';
+      RATINGS.forEach(A=>{
+        html+=`<tr><th>${A}</th>`;
+        TYPES.forEach(T=>{
+          const v=DATA_100[T][A]*(pct/100);
+          html+=`<td data-type="${T}" data-amp="${A}">${fmt(v)}</td>`;
+        });
+        html+='</tr>';
+      });
+      html+='</tbody>';
+      els.matrix.innerHTML=html;
+      highlight();
     }
 
-    mcbType.value = load('zs.type', 'B');
-    mcbAmps.value = load('zs.amps', '6');
-    eightyToggle.checked = load('zs.80', true);
-    mcbType.addEventListener('change', updateZs);
-    mcbAmps.addEventListener('change', updateZs);
-    eightyToggle.addEventListener('change', updateZs);
+    function highlight(){
+      els.matrix.querySelectorAll('td').forEach(td=>td.classList.remove('hit'));
+      const cell=els.matrix.querySelector(`td[data-type="${selType}"][data-amp="${selAmp}"]`);
+      if(cell) cell.classList.add('hit');
+    }
 
-    $('#saveZs').addEventListener('click', ()=>{ try{ const o = JSON.parse(zsJSON.value); store('zs.table', o); location.reload(); }catch{ alert('Invalid JSON'); } });
-    $('#resetZs').addEventListener('click', ()=>{ store('zs.table', defaultZs); location.reload(); });
+    function setTextColor(textEl, fillEl){
+      const fillWidth=parseFloat(fillEl.style.width)||0;
+      textEl.style.color = (fillWidth<=0) ? '#00ff6a' : '#000';
+    }
 
+    // Generic drag for the three Max Zs bars
+    function attachDrag(bar,fill,text,cb){
+      function setFromX(x){
+        const r=bar.getBoundingClientRect();
+        let p=(x-r.left)/r.width; p=Math.max(0,Math.min(1,p));
+        cb(p);
+        setTextColor(text,fill);
+      }
+      function start(e){
+        e.preventDefault();
+        const move=(ev)=>{ const pt=ev.touches?ev.touches[0]:ev; setFromX(pt.clientX); };
+        const end=()=>{ document.removeEventListener('mousemove',move); document.removeEventListener('touchmove',move); document.removeEventListener('mouseup',end); document.removeEventListener('touchend',end); };
+        document.addEventListener('mousemove',move,{passive:false});
+        document.addEventListener('touchmove',move,{passive:false});
+        document.addEventListener('mouseup',end);
+        document.addEventListener('touchend',end);
+      }
+      bar.addEventListener('mousedown',start,{passive:false});
+      bar.addEventListener('touchstart',start,{passive:false});
+    }
+
+    // TYPE slider
+    (function(){
+      const values=TYPES;
+      attachDrag(els.typeBar,els.typeFill,els.typeText,(p)=>{
+        const idx=Math.round(p*(values.length-1));
+        selType=values[idx];
+        els.typeFill.style.width=(idx/(values.length-1))*100+'%';
+        els.typeText.textContent=selType;
+        buildTable();
+      });
+    })();
+
+    // AMP slider
+    (function(){
+      const values=RATINGS;
+      attachDrag(els.ampBar,els.ampFill,els.ampText,(p)=>{
+        const idx=Math.round(p*(values.length-1));
+        selAmp=values[idx];
+        els.ampFill.style.width=(idx/(values.length-1))*100+'%';
+        els.ampText.textContent=selAmp+'A';
+        highlight();
+      });
+    })();
+
+    // PERCENT slider (binary 80/100)
+    (function(){
+      attachDrag(els.pctBar,els.pctFill,els.pctText,(p)=>{
+        const val=(p<0.5)?80:100; pct=val;
+        els.pctFill.style.width=(val===80?0:100)+'%';
+        els.pctText.textContent=val+'%';
+        buildTable();
+      });
+    })();
+
+    // Init Max Zs
+    (function initZs(){
+      els.typeFill.style.width='0%';
+      els.ampFill.style.width=(RATINGS.indexOf(32)/(RATINGS.length-1))*100+'%';
+      els.pctFill.style.width='0%'; // start at 80%
+      els.typeText.textContent='B';
+      els.ampText.textContent='32A';
+      els.pctText.textContent='80%';
+      setTextColor(els.typeText,els.typeFill);
+      setTextColor(els.ampText,els.ampFill);
+      setTextColor(els.pctText,els.pctFill);
+      buildTable();
+    })();
+
+    // First render ring values
     updateRing();
-    updateZs();
   </script>
 </body>
 </html>
