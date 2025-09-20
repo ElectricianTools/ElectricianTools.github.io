@@ -381,11 +381,30 @@
     }
 
     @media (max-width: 768px) {
+      .data-table {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .data-table tr {
+        display: contents;
+      }
+      
       .data-table td {
         display: block;
         width: 100%;
         padding: 1rem;
       }
+      
+      /* Input cells - show first */
+      .data-table tr:nth-child(1) .input-cell { order: 1; }
+      .data-table tr:nth-child(2) .input-cell { order: 2; }
+      .data-table tr:nth-child(3) .input-cell { order: 3; }
+      
+      /* Output cells - show after */
+      .data-table tr:nth-child(1) .output-cell { order: 4; }
+      .data-table tr:nth-child(2) .output-cell { order: 5; }
+      .data-table tr:nth-child(3) .output-cell { order: 6; }
       
       .row-content {
         gap: 1rem;
