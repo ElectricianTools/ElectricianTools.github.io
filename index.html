@@ -3,797 +3,236 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Electrician Tools Pro</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>Electrician Tools - Hacker Style</title>
   <style>
-    :root {
-      --primary: #00ff88;
-      --primary-dark: #00cc6a;
-      --secondary: #00d4ff;
-      --accent: #ffaa00;
-      --success: #00ff88;
-      --bg-dark: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
-      --glass-bg: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.1);
-      --text-light: #ffffff;
-      --card-bg-dark: rgba(255, 255, 255, 0.05);
-      --input-bg: rgba(255, 255, 255, 0.08);
-      --input-border: rgba(255, 255, 255, 0.2);
-      --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.4);
-    }
+    :root{ --fg:#0f0; --bg:#000; --line:#0f0; --box-h:1.8em; }
+    body { margin:0; padding:0; font-family:monospace; background:var(--bg); color:var(--fg); }
+    nav { background:var(--bg); border-bottom:1px solid var(--line); display:flex; gap:1rem; padding:.5rem; }
+    nav button { background:transparent; border:1px solid var(--line); color:var(--fg); padding:.25rem .5rem; cursor:pointer; }
+    nav button.active { background:var(--fg); color:#000; }
+    .section { display:none; padding:1rem; }
+    .section.active { display:block; }
+    input, select, textarea, button { background:#000; color:#0f0; border:1px solid #0f0; font-family:monospace; padding:.25rem; height:var(--box-h); box-sizing:border-box; font-size:0.8rem; }
+    h1, summary { color:#0f0; }
+    details { border:1px solid #0f0; padding:.5rem; margin-top:1rem; }
+    .label-small { font-size:0.7rem; color:#0f0; margin-bottom:0.1rem; display:block; text-align:left; }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    .inputs-row, .results-row { display:flex; gap:0.5rem; align-items:flex-start; margin-bottom:0.3rem; }
+    .inputs-row > div, .results-row > div { display:flex; flex-direction:column; align-items:flex-start; }
+    .temp-input { width:6ch; text-align:left; -moz-appearance:textfield; padding-right:1.2em; }
+    .temp-input::-webkit-outer-spin-button,
+    .temp-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .temp-wrapper { position:relative; display:inline-block; }
+    .temp-wrapper::after { content:"°C"; position:absolute; right:4px; top:50%; transform:translateY(-50%); color:#0f0; font-size:0.8rem; pointer-events:none; }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-dark);
-      color: var(--text-light);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow-x: hidden;
-    }
+    .result-box { border:1px solid #0f0; background:#000; padding:0 .5rem; min-width:6ch; text-align:left; font-family:monospace; color:#0f0; height:var(--box-h); display:flex; align-items:center; box-sizing:border-box; font-size:0.8rem; }
 
-    .bg-particles {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    .particle {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      animation: float 20s infinite linear;
-    }
-
-    @keyframes float {
-      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
-    }
-
-    nav {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      width: 100%;
-      padding: 1rem 0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow);
-    }
-
-    .nav-tabs {
-      display: flex;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 50px;
-      padding: 0.5rem;
-      gap: 0.5rem;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .nav-tab {
-      background: transparent;
-      border: none;
-      border-radius: 40px;
-      padding: 0.75rem 2rem;
-      font-weight: 500;
-      font-size: 0.95rem;
-      cursor: pointer;
-      color: rgba(255, 255, 255, 0.7);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .nav-tab.active {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
-      transform: translateY(-1px);
-    }
-
-    .section {
-      display: none;
-      width: 100%;
-      max-width: 1200px;
-      padding: 2rem;
-      animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .section.active {
-      display: block;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .card {
-      background: var(--card-bg-dark);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      padding: 2.5rem;
-      box-shadow: var(--shadow);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-hover);
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .subtitle {
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 2rem;
-      font-size: 1.1rem;
-      font-weight: 300;
-    }
-
-    /* NEW TABLE STRUCTURE */
-    .data-table {
-      width: 100%;
-      border: none;
-      border-collapse: collapse;
-      margin: 1rem 0;
-      background: transparent;
-    }
-
-    .data-table td {
-      border: none;
-      padding: 1rem 1.5rem;
-      vertical-align: middle;
-      width: auto;
-      min-width: auto;
-    }
-
-    .input-cell {
-      background: transparent;
-    }
-
-    .output-cell {
-      background: transparent;
-    }
-
-    .row-content {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-      width: 100%;
-    }
-
-    .big-label {
-      font-size: 2.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      min-width: 80px;
-      flex-shrink: 0;
-    }
-
-    .big-value {
-      font-size: 2.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    input, select {
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      border-radius: 12px;
-      padding: 0.75rem 1rem;
-      color: var(--text-light);
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-    }
-
-    select option {
-      background: #2a2a2a;
-      color: var(--text-light);
-      border: none;
-    }
-
-    .compact-input {
-      width: 100px;
-      text-align: center;
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
-      transform: translateY(-1px);
-    }
-
-    /* SLIDER */
-    .slider-container {
-      display: grid;
-      grid-template-columns: 150px 1fr 150px;
-      gap: 1rem;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 1rem;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 1rem;
-    }
-
-    .slider-label {
-      font-size: 2.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    input[type="range"] {
-      -webkit-appearance: none;
-      appearance: none;
-      height: 8px;
-      background: linear-gradient(to right, var(--primary), var(--secondary));
-      border-radius: 5px;
-      outline: none;
-      border: none;
-      padding: 0;
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #fff, #f0f0f0);
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      border: 2px solid var(--primary);
-      transition: all 0.2s ease;
-    }
-
-    /* ZS SECTION */
-    .zs-controls {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .field-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    label {
-      font-weight: 500;
-      font-size: 0.95rem;
-      color: rgba(255, 255, 255, 0.9);
-      margin-bottom: 0.5rem;
-    }
-
-    .result-display {
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: 16px;
-      padding: 1.5rem;
-      text-align: center;
-      margin: 1.5rem 0;
-    }
-
-    .result-value {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--success);
-      margin-bottom: 0.5rem;
-    }
-
-    .result-label {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 0.9rem;
-    }
-
-    .checkbox-container {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      cursor: pointer;
-    }
-
-    .custom-checkbox {
-      position: relative;
-      width: 24px;
-      height: 24px;
-      background: var(--input-bg);
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 6px;
-      transition: all 0.3s ease;
-    }
-
-    .custom-checkbox::after {
-      content: '✓';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      color: white;
-      font-weight: bold;
-      transition: transform 0.2s ease;
-    }
-
-    input[type="checkbox"]:checked + .custom-checkbox {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      border-color: var(--primary);
-    }
-
-    input[type="checkbox"]:checked + .custom-checkbox::after {
-      transform: translate(-50%, -50%) scale(1);
-    }
-
-    input[type="checkbox"] {
-      display: none;
-    }
-
-    .mobile-layout {
-      display: none;
-    }
-
-    @media (max-width: 768px) {
-      .data-table {
-        display: none;
-      }
-      
-      .mobile-layout {
-        display: block;
-      }
-      
-      .mobile-item {
-        margin-bottom: 1.5rem;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 12px;
-      }
-      
-      .row-content {
-        gap: 1rem;
-      }
-      
-      .big-label {
-        min-width: auto;
-        font-size: 2rem;
-      }
-      
-      .big-value {
-        font-size: 2rem;
-      }
-      
-      .slider-container {
-        grid-template-columns: 80px 1fr 120px;
-        gap: 1rem;
-      }
-      
-      .slider-label {
-        font-size: 2rem;
-      }
-      
-      .section {
-        padding: 1rem;
-      }
-      
-      .card {
-        padding: 1.5rem;
-      }
-      
-      h1 {
-        font-size: 2rem;
-      }
-    }
+    .r1-bar{ position:relative; width:320px; height:var(--box-h); border:1px solid #0f0; background:#000; user-select:none; display:flex; align-items:center; }
+    .r1-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:#00ff6a; }
+    .r1-text{ position:absolute; left:8px; font-weight:700; color:#000; pointer-events:none; z-index:2; font-size:0.8rem; transition:color 0.2s; }
   </style>
 </head>
 <body>
-  <div class="bg-particles" id="particles"></div>
-
   <nav>
-    <div class="nav-tabs">
-      <button id="tabRing" class="nav-tab active">⚡ Ring Continuity</button>
-      <button id="tabZs" class="nav-tab">🔧 Max Zs</button>
-    </div>
+    <button id="tabRing" class="active" data-tab="ring">Ring Continuity</button>
+    <button id="tabZs" data-tab="zs">Max Zs</button>
   </nav>
 
-  <!-- Ring continuity -->
   <div id="ring" class="section active">
-    <div class="card">
-      <h1>Ring Continuity Checker</h1>
-      <p class="subtitle">Calculate expected values for ring final circuit testing</p>
-
-      <table class="data-table">
-        <tr>
-          <td class="input-cell">
-            <div class="row-content">
-              <div class="big-label">LINE</div>
-              <select id="lineCSA" class="compact-input">
-                <option value="2.5" selected>2.5</option>
-                <option value="4">4.0</option>
-                <option value="6">6.0</option>
-              </select>
-            </div>
-          </td>
-          <td class="output-cell">
-            <div class="row-content">
-              <div class="big-label">r2</div>
-              <div class="big-value" id="r2">0.00</div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td class="input-cell">
-            <div class="row-content">
-              <div class="big-label">CPC</div>
-              <select id="cpcCSA" class="compact-input">
-                <option value="1.0">1.0</option>
-                <option value="1.5" selected>1.5</option>
-                <option value="2.5">2.5</option>
-              </select>
-            </div>
-          </td>
-          <td class="output-cell">
-            <div class="row-content">
-              <div class="big-label">R1+R2</div>
-              <div class="big-value" id="r1r2">0.00</div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td class="input-cell">
-            <div class="row-content">
-              <div class="big-label">TEMP</div>
-              <input type="number" id="temp" value="30" step="1" class="compact-input" />
-            </div>
-          </td>
-          <td class="output-cell">
-            <div class="row-content">
-              <div class="big-label">Length</div>
-              <div class="big-value" id="cableLength">0.00</div>
-            </div>
-          </td>
-        </tr>
-      </table>
-
-      <!-- Mobile Layout -->
-      <div class="mobile-layout">
-        <div class="mobile-item">
-          <div class="row-content">
-            <div class="big-label">LINE</div>
-            <select id="lineCSA-mobile" class="compact-input">
-              <option value="2.5" selected>2.5</option>
-              <option value="4">4.0</option>
-              <option value="6">6.0</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="mobile-item">
-          <div class="row-content">
-            <div class="big-label">CPC</div>
-            <select id="cpcCSA-mobile" class="compact-input">
-              <option value="1.5" selected>1.5</option>
-              <option value="2.5">2.5</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="mobile-item">
-          <div class="row-content">
-            <div class="big-label">TEMP</div>
-            <input type="number" id="temp-mobile" value="30" step="1" class="compact-input" />
-          </div>
-        </div>
-        
-        <div class="mobile-item">
-          <div class="row-content">
-            <div class="big-label">r2</div>
-            <div class="big-value" id="r2-mobile">0.00 Ω</div>
-          </div>
-        </div>
-        
-        <div class="mobile-item">
-          <div class="row-content">
-            <div class="big-label">R1+R2</div>
-            <div class="big-value" id="r1r2-mobile">0.00 Ω</div>
-          </div>
-        </div>
-        
-        <div class="mobile-item">
-          <div class="row-content">
-            <div class="big-label">Length</div>
-            <div class="big-value" id="cableLength-mobile">0 m</div>
-          </div>
+    <h1 id="ringTitle">Ring Continuity Checker</h1>
+    <div class="inputs-row">
+      <div>
+        <label class="label-small" for="lineCSA">LINE</label>
+        <select id="lineCSA"><option>2.5</option><option>4.0</option><option>6.0</option></select>
+      </div>
+      <div>
+        <label class="label-small" for="cpcCSA">CPC</label>
+        <select id="cpcCSA"><option>1.0</option><option>1.5</option><option>2.5</option></select>
+      </div>
+      <div>
+        <label class="label-small" for="temp">TEMP</label>
+        <div class="temp-wrapper">
+          <input type="number" id="temp" class="temp-input" value="30" />
         </div>
       </div>
+    </div>
 
-      <div class="slider-container">
-        <div class="slider-label">r1</div>
-        <input type="range" id="r1Slider" min="0" max="2" step="0.01" value="0" />
-        <div class="big-value" id="r1Value">0.00 Ω</div>
+    <div class="results-row">
+      <div>
+        <label class="label-small">r2</label>
+        <div id="r2" class="result-box">0 Ω</div>
+      </div>
+      <div>
+        <label class="label-small">R1+R2</label>
+        <div id="r1r2" class="result-box">0.00 Ω</div>
+      </div>
+      <div>
+        <label class="label-small">Length</label>
+        <div id="cableLength" class="result-box">0 m</div>
+      </div>
+    </div>
+
+    <div class="results-row">
+      <div>
+        <label class="label-small">r1</label>
+        <div id="r1Bar" class="r1-bar" aria-label="r1 slider" role="slider" aria-valuemin="0" aria-valuemax="2.00" aria-valuenow="0.00">
+          <div id="r1Fill" class="r1-fill"></div>
+          <div id="r1Text" class="r1-text">0.00 Ω</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Max Zs -->
   <div id="zs" class="section">
-    <div class="card">
-      <h1>Max Zs Calculator</h1>
-      <p class="subtitle">Quick lookup with 80% factor option for different MCB types</p>
-      
-      <div class="zs-controls">
-        <div class="field-item">
-          <label for="mcbType">MCB Type</label>
-          <select id="mcbType" class="compact-input">
-            <option>B</option>
-            <option>C</option>
-            <option>D</option>
-          </select>
-        </div>
-        
-        <div class="field-item">
-          <label for="mcbAmps">Rating (A)</label>
-          <select id="mcbAmps" class="compact-input">
-            <option>6</option>
-            <option>10</option>
-            <option>16</option>
-            <option>20</option>
-            <option>25</option>
-            <option>32</option>
-            <option>40</option>
-            <option>45</option>
-          </select>
-        </div>
-        
-        <div class="field-item">
-          <label for="eightyToggle">Apply 80% Factor</label>
-          <div class="checkbox-container">
-            <input id="eightyToggle" type="checkbox" checked>
-            <div class="custom-checkbox"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="result-display">
-        <div class="result-value" id="zsResult">-- Ω</div>
-        <div class="result-label">Maximum Zs Value</div>
-      </div>
-    </div>
+    <h1>Max Zs (80%)</h1>
+    <select id="mcbType"><option>B</option><option>C</option><option>D</option></select>
+    <select id="mcbAmps"><option>6</option><option>10</option><option>16</option><option>20</option><option>25</option><option>32</option><option>40</option><option>45</option></select>
+    <div class="result">Zs: <span id="zsResult">-- Ω</span></div>
+    <label><input id="eightyToggle" type="checkbox" checked /> 80% factor</label>
+    <details>
+      <summary>Show/Edit table</summary>
+      <textarea id="zsJSON"></textarea>
+      <button id="saveZs">Save</button>
+      <button id="resetZs">Reset</button>
+    </details>
   </div>
 
   <script>
-    // Create floating particles
-    function createParticles() {
-      const container = document.getElementById('particles');
-      for (let i = 0; i < 50; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 20 + 's';
-        particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
-        container.appendChild(particle);
-      }
-    }
-
-    createParticles();
-
-    // Utility functions
-    const $ = s => document.querySelector(s);
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => Array.from(document.querySelectorAll(s));
     const store = (k, v) => localStorage.setItem(k, JSON.stringify(v));
-    const load = (k, d) => {
-      try {
-        const v = JSON.parse(localStorage.getItem(k));
-        return v ?? d;
-      } catch {
-        return d;
-      }
-    };
+    const load = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
 
-    // Tab switching
-    function showTab(id) {
-      document.querySelectorAll('.section').forEach(el => {
-        el.classList.remove('active');
-      });
-      document.querySelectorAll('.nav-tab').forEach(el => {
-        el.classList.remove('active');
-      });
-      
-      setTimeout(() => {
-        document.getElementById(id).classList.add('active');
-        document.getElementById(id === 'ring' ? 'tabRing' : 'tabZs').classList.add('active');
-      }, 100);
-      
-      store('etools.tab', id);
+    const lastTab = load('tab','ring');
+    function showTab(id){
+      $$('#ring,#zs').forEach(x=>x.classList.remove('active'));
+      $$('#tabRing,#tabZs').forEach(x=>x.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelector(`[data-tab="${id}"]`).classList.add('active');
+      store('tab',id);
+    }
+    $('#tabRing').onclick=()=>showTab('ring');
+    $('#tabZs').onclick=()=>showTab('zs');
+    showTab(lastTab);
+
+    const R_PER_M_20C = { 1.0:0.0181, 1.5:0.0121, 2.5:0.00741, 4.0:0.00461, 6.0:0.00308 };
+    const ALPHA = 0.00393;
+    const maxR1 = 2.00;
+
+    const lineCSA = $('#lineCSA');
+    const cpcCSA  = $('#cpcCSA');
+    const temp    = $('#temp');
+    const r2Out = $('#r2');
+    const r1r2Out = $('#r1r2');
+    const lenOut = $('#cableLength');
+
+    const r1Bar = $('#r1Bar');
+    const r1Fill = $('#r1Fill');
+    const r1Text = $('#r1Text');
+
+    let r1 = load('ring.r1', 0);
+    let dragging = false;
+
+    function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+
+    function setR1(val){
+      r1 = clamp(val, 0, maxR1);
+      const pct = (r1 / maxR1) * 100;
+      r1Fill.style.width = pct.toFixed(2) + '%';
+      r1Text.textContent = r1.toFixed(2) + ' Ω';
+
+      // Measure only the number width, ignore the trailing unit symbol
+      const digitsWidth = r1Text.textContent.split(' ')[0].length * 8; // approx 8px per char
+      const textPos = r1Text.offsetLeft + digitsWidth;
+      const fillWidth = r1Fill.offsetWidth;
+
+      if(fillWidth < textPos){
+        r1Text.style.color = '#0f0';
+      } else {
+        r1Text.style.color = '#000';
+      }
+
+      r1Bar.setAttribute('aria-valuenow', r1.toFixed(2));
+      store('ring.r1', r1);
+      updateRing();
     }
 
-    $('#tabRing').onclick = () => showTab('ring');
-    $('#tabZs').onclick = () => showTab('zs');
-    showTab(load('etools.tab', 'ring'));
+    function posToR1(clientX){
+      const rect = r1Bar.getBoundingClientRect();
+      const x = clamp(clientX - rect.left, 0, rect.width);
+      const ratio = x / rect.width;
+      return ratio * maxR1;
+    }
 
-    // Ring continuity calculations
-    const R_PER_M_20C = {
-      1.0: 0.0181,
-      1.5: 0.0121,
-      2.5: 0.00741,
-      4: 0.00461,
-      6: 0.00308
-    };
-    const ALPHA = 0.00393;
+    r1Bar.addEventListener('pointerdown', (e)=>{ dragging = true; r1Bar.setPointerCapture(e.pointerId); setR1(posToR1(e.clientX)); });
+    r1Bar.addEventListener('pointermove', (e)=>{ if(!dragging) return; setR1(posToR1(e.clientX)); });
+    r1Bar.addEventListener('pointerup',   (e)=>{ dragging = false; r1Bar.releasePointerCapture(e.pointerId); });
+    r1Bar.addEventListener('pointercancel', ()=> dragging = false);
 
-    const r1Slider = $('#r1Slider');
-    const r1Value = $('#r1Value');
-    const r2Display = $('#r2');
-    const r1r2Display = $('#r1r2');
-    const cableLengthDisplay = $('#cableLength');
-    const lineCSA = $('#lineCSA');
-    const cpcCSA = $('#cpcCSA');
-    const temp = $('#temp');
-
-    // Mobile elements
-    const lineCSAMobile = $('#lineCSA-mobile');
-    const cpcCSAMobile = $('#cpcCSA-mobile');
-    const tempMobile = $('#temp-mobile');
-    const r2DisplayMobile = $('#r2-mobile');
-    const r1r2DisplayMobile = $('#r1r2-mobile');
-    const cableLengthDisplayMobile = $('#cableLength-mobile');
-
-    // Load saved values
-    lineCSA.value = load('etools.lineCSA', '2.5');
-    cpcCSA.value = load('etools.cpcCSA', '1.5');
-    temp.value = load('etools.temp', 30);
-    r1Slider.value = load('etools.r1', 0);
-
-    // Sync mobile values
-    lineCSAMobile.value = lineCSA.value;
-    cpcCSAMobile.value = cpcCSA.value;
-    tempMobile.value = temp.value;
-
-    function updateRing() {
-      const r1 = parseFloat(r1Slider.value);
-      r1Value.textContent = r1.toFixed(2) + ' Ω';
-      
+    function updateRing(){
       const L = parseFloat(lineCSA.value);
       const E = parseFloat(cpcCSA.value);
-      
-      if (!R_PER_M_20C[L] || !R_PER_M_20C[E]) return;
-      
-      const mult = L / E;
-      const r2 = r1 * mult;
-      r2Display.textContent = r2.toFixed(2) + ' Ω';
-      r2DisplayMobile.textContent = r2.toFixed(2) + ' Ω';
-      
+      const T = parseFloat(temp.value) || 30;
+      const ohmPerM = R_PER_M_20C[L];
+      if(!ohmPerM || !R_PER_M_20C[E]){ r2Out.textContent='--'; r1r2Out.textContent='--'; lenOut.textContent='--'; return; }
+
+      const r2 = r1 * (L / E);
       const r1r2 = (r1 + r2) / 4;
-      r1r2Display.textContent = r1r2.toFixed(2) + ' Ω';
-      r1r2DisplayMobile.textContent = r1r2.toFixed(2) + ' Ω';
-      
-      const T = parseFloat(temp.value);
       const corr = 1 + ALPHA * (T - 20);
-      const r1_at_20 = r1 / corr;
-      const length_m = r1_at_20 / R_PER_M_20C[L];
-      cableLengthDisplay.textContent = length_m.toFixed(0) + ' m';
-      cableLengthDisplayMobile.textContent = length_m.toFixed(0) + ' m';
-      
-      // Save values
-      store('etools.lineCSA', lineCSA.value);
-      store('etools.cpcCSA', cpcCSA.value);
-      store('etools.temp', temp.value);
-      store('etools.r1', r1);
+      const r1_20 = r1 / corr;
+      const halfLen = r1_20 / ohmPerM;
+
+      r2Out.textContent = r2.toFixed(2) + ' Ω';
+      r1r2Out.textContent = r1r2.toFixed(2) + ' Ω';
+      lenOut.textContent = Math.round(halfLen) + ' m';
+
+      store('ring.lineCSA', L);
+      store('ring.cpcCSA', E);
+      store('ring.temp', T);
     }
 
-    // Sync desktop and mobile inputs
-    function syncInputs() {
-      lineCSAMobile.value = lineCSA.value;
-      cpcCSAMobile.value = cpcCSA.value;
-      tempMobile.value = temp.value;
-    }
+    lineCSA.value = load('ring.lineCSA', '2.5');
+    cpcCSA.value  = load('ring.cpcCSA',  '1.0');
+    temp.value    = load('ring.temp', 30);
+    setR1(load('ring.r1', 0));
+    lineCSA.addEventListener('change', updateRing);
+    cpcCSA.addEventListener('change', updateRing);
+    temp.addEventListener('input', updateRing);
 
-    function syncFromMobile() {
-      lineCSA.value = lineCSAMobile.value;
-      cpcCSA.value = cpcCSAMobile.value;
-      temp.value = tempMobile.value;
-    }
-
-    r1Slider.oninput = updateRing;
-    lineCSA.onchange = () => { syncInputs(); updateRing(); };
-    cpcCSA.onchange = () => { syncInputs(); updateRing(); };
-    temp.oninput = () => { syncInputs(); updateRing(); };
-
-    // Mobile input events
-    lineCSAMobile.onchange = () => { syncFromMobile(); updateRing(); };
-    cpcCSAMobile.onchange = () => { syncFromMobile(); updateRing(); };
-    tempMobile.oninput = () => { syncFromMobile(); updateRing(); };
-    
-    // Initial update to show units
-    updateRing();
-    setTimeout(updateRing, 100);
-
-    // Max Zs calculations
     const defaultZs = {
-      "B": {"6": 5.83, "10": 3.50, "16": 2.19, "20": 1.75, "25": 1.40, "32": 1.10, "40": 0.88, "45": 0.78},
-      "C": {"6": 2.92, "10": 1.75, "16": 1.10, "20": 0.88, "25": 0.70, "32": 0.55, "40": 0.44, "45": 0.39},
-      "D": {"6": 1.46, "10": 0.88, "16": 0.55, "20": 0.44, "25": 0.35, "32": 0.28, "40": 0.22, "45": 0.09}
+      "B": {"6":5.83, "10":3.50, "16":2.19, "20":1.75, "25":1.40, "32":1.10, "40":0.88, "45":0.78},
+      "C": {"6":2.92, "10":1.75, "16":1.10, "20":0.88, "25":0.70, "32":0.55, "40":0.44, "45":0.39},
+      "D": {"6":1.46, "10":0.88, "16":0.55, "20":0.44, "25":0.35, "32":0.28, "40":0.22, "45":0.19}
     };
-
-    const zsTable = load('etools.zsTable', defaultZs);
+    const zsTable = load('zs.table', defaultZs);
     const mcbType = $('#mcbType');
     const mcbAmps = $('#mcbAmps');
     const zsResult = $('#zsResult');
     const eightyToggle = $('#eightyToggle');
+    const zsJSON = $('#zsJSON');
 
-    // Load saved values
-    mcbType.value = load('etools.mcbType', 'B');
-    mcbAmps.value = load('etools.mcbAmps', '6');
-    eightyToggle.checked = load('etools.eighty', true);
+    zsJSON.value = JSON.stringify(zsTable, null, 2);
 
-    function updateZs() {
-      const base = zsTable?.[mcbType.value]?.[mcbAmps.value];
-      if (!base) {
-        zsResult.textContent = '— not in table —';
-        return;
-      }
-      
-      const out = eightyToggle.checked ? base : (base / 0.8);
+    function updateZs(){
+      const t = mcbType.value; const a = mcbAmps.value;
+      const base = zsTable?.[t]?.[a];
+      if(base == null){ zsResult.textContent = '-- Ω'; return; }
+      const out = eightyToggle.checked ? base : (base/0.8);
       zsResult.textContent = out.toFixed(2) + ' Ω';
-      
-      // Save values
-      store('etools.mcbType', mcbType.value);
-      store('etools.mcbAmps', mcbAmps.value);
-      store('etools.eighty', eightyToggle.checked);
+      store('zs.type', t); store('zs.amps', a); store('zs.80', eightyToggle.checked);
     }
 
-    mcbType.onchange = updateZs;
-    mcbAmps.onchange = updateZs;
-    eightyToggle.onchange = updateZs;
+    mcbType.value = load('zs.type', 'B');
+    mcbAmps.value = load('zs.amps', '6');
+    eightyToggle.checked = load('zs.80', true);
+    mcbType.addEventListener('change', updateZs);
+    mcbAmps.addEventListener('change', updateZs);
+    eightyToggle.addEventListener('change', updateZs);
+
+    $('#saveZs').addEventListener('click', ()=>{ try{ const o = JSON.parse(zsJSON.value); store('zs.table', o); location.reload(); }catch{ alert('Invalid JSON'); } });
+    $('#resetZs').addEventListener('click', ()=>{ store('zs.table', defaultZs); location.reload(); });
+
+    updateRing();
     updateZs();
   </script>
 </body>
