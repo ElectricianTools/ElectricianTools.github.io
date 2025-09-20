@@ -6,7 +6,7 @@
   <title>Electrician Tools</title>
   <style>
     :root{ --fg:#0f0; --bg:#000; --line:#0f0; --box-h:1.8em; }
-    body { margin:0; padding:0; font-family:monospace; background:var(--bg); color:var(--fg); overscroll-behavior:none; }
+    body { margin:0; padding:0; font-family:monospace; background:var(--bg); color:var(--fg); }
     nav { background:var(--bg); border-bottom:1px solid var(--line); display:flex; gap:1rem; padding:.5rem; }
     nav button { background:transparent; border:1px solid var(--line); color:var(--fg); padding:.25rem .5rem; cursor:pointer; }
     nav button.active { background:var(--fg); color:#000; }
@@ -27,7 +27,7 @@
 
     .result-box { border:1px solid #0f0; background:#000; padding:0 .5rem; min-width:6ch; text-align:left; font-family:monospace; color:#0f0; height:var(--box-h); display:flex; align-items:center; box-sizing:border-box; font-size:0.8rem; }
 
-    .r1-bar{ position:relative; width:320px; height:var(--box-h); border:1px solid #0f0; background:#000; user-select:none; display:flex; align-items:center; touch-action:none; -ms-touch-action:none; cursor:ew-resize; }
+    .r1-bar{ position:relative; width:320px; height:var(--box-h); border:1px solid #0f0; background:#000; user-select:none; display:flex; align-items:center; }
     .r1-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:#00ff6a; }
     .r1-text{ position:absolute; left:8px; font-weight:700; color:#000; pointer-events:none; z-index:2; font-size:0.8rem; transition:color 0.2s; }
   </style>
@@ -132,9 +132,6 @@
 
     let r1 = load('ring.r1', 0);
     let dragging = false;
-    let r1Rect = null; // cached bounds during drag
-    let lastClientX = 0;
-    let rafPending = false;
 
     function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
 
@@ -161,66 +158,16 @@
     }
 
     function posToR1(clientX){
-      const rect = r1Rect || r1Bar.getBoundingClientRect();
+      const rect = r1Bar.getBoundingClientRect();
       const x = clamp(clientX - rect.left, 0, rect.width);
       const ratio = x / rect.width;
       return ratio * maxR1;
     }
 
-    r1Bar.addEventListener('pointerdown', (e)=>{
-      e.preventDefault();
-      dragging = true;
-      r1Rect = r1Bar.getBoundingClientRect();
-      lastClientX = e.clientX;
-      r1Bar.setPointerCapture(e.pointerId);
-      setR1(posToR1(lastClientX));
-    }, {passive:false});
-
-    function onPointerMove(e){
-      if(!dragging) return;
-      e.preventDefault();
-      lastClientX = e.clientX;
-      if(!rafPending){
-        rafPending = true;
-        requestAnimationFrame(()=>{ setR1(posToR1(lastClientX)); rafPending = false; });
-      }
-    }
-    r1Bar.addEventListener('pointermove', onPointerMove, {passive:false});
-
-    function endPointer(e){
-      dragging = false;
-      r1Rect = null;
-      try{ r1Bar.releasePointerCapture(e.pointerId); }catch{}
-    }
-    r1Bar.addEventListener('pointerup', endPointer);
-    r1Bar.addEventListener('pointercancel', endPointer);
-    r1Bar.addEventListener('pointerleave', (e)=>{ if(dragging) endPointer(e); });
-
-    // Touch fallback so you can drag from anywhere inside the box on older mobiles
-    r1Bar.addEventListener('touchstart', (e)=>{
-      if(e.changedTouches && e.changedTouches[0]){
-        e.preventDefault();
-        dragging = true;
-        r1Rect = r1Bar.getBoundingClientRect();
-        lastClientX = e.changedTouches[0].clientX;
-        setR1(posToR1(lastClientX));
-      }
-    }, {passive:false});
-    r1Bar.addEventListener('touchmove', (e)=>{
-      if(!dragging) return;
-      if(e.changedTouches && e.changedTouches[0]){
-        e.preventDefault();
-        lastClientX = e.changedTouches[0].clientX;
-        if(!rafPending){
-          rafPending = true;
-          requestAnimationFrame(()=>{ setR1(posToR1(lastClientX)); rafPending = false; });
-        }
-      }
-    }, {passive:false});
-    r1Bar.addEventListener('touchend', ()=>{ dragging=false; r1Rect=null; });
-    r1Bar.addEventListener('touchcancel', ()=>{ dragging=false; r1Rect=null; });
-
-    window.addEventListener('resize', ()=>{ if(r1Rect) r1Rect = r1Bar.getBoundingClientRect(); });
+    r1Bar.addEventListener('pointerdown', (e)=>{ dragging = true; r1Bar.setPointerCapture(e.pointerId); setR1(posToR1(e.clientX)); });
+    r1Bar.addEventListener('pointermove', (e)=>{ if(!dragging) return; setR1(posToR1(e.clientX)); });
+    r1Bar.addEventListener('pointerup',   (e)=>{ dragging = false; r1Bar.releasePointerCapture(e.pointerId); });
+    r1Bar.addEventListener('pointercancel', ()=> dragging = false);
 
     function updateRing(){
       const L = parseFloat(lineCSA.value);
