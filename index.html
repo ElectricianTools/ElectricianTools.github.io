@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Electrician Tools</title>
   <style>
-    :root{ --fg:#0f0; --bg:#000; --line:#0f0; --box-h:1.8em; --hit-bg:#00ff6a; --hit-fg:#000; }
+    :root{ --fg:#0f0; --bg:#000; --line:#0f0; --box-h:1.8em; --hit-bg:#00ff6a; --hit-fg:#000; --container: calc(100vw - 100px); }
     body { margin:0; padding:0; font-family:monospace; background:var(--bg); color:var(--fg); }
-    nav { background:var(--bg); border-bottom:1px solid var(--line); display:flex; gap:1rem; padding:.5rem; }
+    nav { background:var(--bg); border-bottom:1px solid var(--line); display:flex; justify-content:center; gap:1rem; padding:.5rem; }
     nav button { background:transparent; border:1px solid var(--line); color:var(--fg); padding:.25rem .5rem; cursor:pointer; }
     nav button.active { background:var(--fg); color:#000; }
-    .section { display:none; padding:1rem; }
+    .section { display:none; padding:1rem 0; }
     .section.active { display:block; }
     input, select, textarea, button { background:#000; color:#0f0; border:1px solid #0f0; font-family:monospace; padding:.25rem; height:var(--box-h); box-sizing:border-box; font-size:0.8rem; }
     h1, summary { color:#0f0; }
@@ -28,7 +28,7 @@
     .result-box { border:1px solid #0f0; background:#000; padding:0 .5rem; min-width:6ch; text-align:left; font-family:monospace; color:#0f0; height:var(--box-h); display:flex; align-items:center; box-sizing:border-box; font-size:0.8rem; }
 
     /* Drag bars */
-    .r1-bar{ position:relative; width:200px; height:1.6em; border:1px solid #0f0; background:#000; user-select:none; display:flex; align-items:center; touch-action:none; cursor:ew-resize; }
+    .r1-bar{ position:relative; width:100%; height:1.8em; border:1px solid #0f0; background:#000; user-select:none; display:flex; align-items:center; touch-action:none; cursor:ew-resize; }
     .r1-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:#00ff6a; }
     .r1-text{ position:absolute; left:8px; font:700 0.8rem monospace; color:#0f0; pointer-events:none; z-index:2; transition:color .15s; }
 
@@ -36,15 +36,18 @@
     .controls{padding:10px 16px;display:flex;flex-direction:column;gap:6px}
     .control{display:flex;flex-direction:column;gap:2px}
     .wrap{padding:10px 16px;display:flex;flex-direction:column;align-items:flex-start}
-    .matrix-wrap{width:200px}
+    .matrix-wrap{width:100%}
     table{width:100%;border-collapse:collapse;background:#000;color:var(--fg);font-variant-numeric:tabular-nums;font-size:12px;table-layout:fixed}
     th,td{border:1px solid #0f0;padding:2px;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
     thead th{background:#000;color:var(--fg)}
-    tbody th{background:#000;color:var(--fg);text-align:left;padding-left:2px;width:35px}
+    tbody th{background:#000;color:var(--fg);text-align:center;padding-left:0;width:35px}
     .hit{background:#00ff6a;color:#000!important}
+    /* Make single-row result stretch full width */
+    .results-row.single > div{ flex:1; width:100%; }
   </style>
 </head>
 <body>
+  <div class="container" style="width:calc(100svw - 100px); max-width:480px; margin:0 auto;">
   <nav>
     <button id="tabRing" class="active" data-tab="ring">Ring Continuity</button>
     <button id="tabZs" data-tab="zs">Max Zs</button>
@@ -85,7 +88,7 @@
       </div>
     </div>
 
-    <div class="results-row">
+    <div class="results-row single">
       <div>
         <label class="label-small">r1</label>
         <div id="r1Bar" class="r1-bar" aria-label="r1 slider" role="slider" aria-valuemin="0" aria-valuemax="2.00" aria-valuenow="0.00">
@@ -98,9 +101,14 @@
 
   <!-- ===== MAX Zs TAB ===== -->
   <div id="zs" class="section">
-    <div style="padding:10px 16px">
+    <div style="padding:10px 0; text-align:center;">
       <h1>MAX Zs</h1>
       <h2 style="margin:0 0 6px 0;font-size:12px;color:var(--fg);font-weight:normal">Device BS EN 60898 / 61009</h2>
+    </div>
+    <div class="wrap">
+      <div class="matrix-wrap">
+        <table id="matrix"></table>
+      </div>
     </div>
     <div class="controls">
       <div class="control" id="typeCtrl">
@@ -113,13 +121,8 @@
         <div class="r1-bar" id="pctBar"><div class="r1-fill" id="pctFill"></div><div class="r1-text" id="pctText">80%</div></div>
       </div>
     </div>
-    <div class="wrap">
-      <div class="matrix-wrap">
-        <table id="matrix"></table>
-      </div>
-    </div>
   </div>
-
+  </div>
   <script>
     const $ = (s) => document.querySelector(s);
     const $$ = (s) => Array.from(document.querySelectorAll(s));
