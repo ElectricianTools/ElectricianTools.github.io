@@ -25,6 +25,26 @@
       gap: 10px;
     }
 
+    .day-buttons {
+      display: flex;
+      gap: 5px;
+      margin-left: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .color-picker {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .day-buttons {
+        width: 100%;
+        justify-content: center;
+        margin-left: 0;
+        margin-top: 15px;
+      }
+    }
+
     .color-button {
       width: 40px;
       height: 40px;
@@ -149,7 +169,7 @@
       <button class="color-button clear-button" data-color="none"></button>
       <span style="font-size: 12px; margin-top: 4px;">Clear</span>
     </div>
-    <div style="display: flex; gap: 5px; margin-left: 20px;">
+    <div class="day-buttons">
       <button id="day-mon-fri" class="day-button active" data-day="weekday" style="background:#2a2a2a;border:2px solid #4da6ff;color:#ccc;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:14px;transition:all 0.2s;">Mon-Fri</button>
       <button id="day-sat" class="day-button" data-day="saturday" style="background:#2a2a2a;border:2px solid #666;color:#aaa;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:14px;transition:all 0.2s;">Saturday</button>
       <button id="day-sun" class="day-button" data-day="sunday" style="background:#2a2a2a;border:2px solid #666;color:#aaa;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:14px;transition:all 0.2s;">Sunday</button>
