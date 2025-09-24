@@ -149,6 +149,11 @@
       <button class="color-button clear-button" data-color="none"></button>
       <span style="font-size: 12px; margin-top: 4px;">Clear</span>
     </div>
+    <div style="display: flex; gap: 5px; margin-left: 20px;">
+      <button id="day-mon-fri" class="day-button active" data-day="weekday" style="background:#2a2a2a;border:2px solid #4da6ff;color:#ccc;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:14px;transition:all 0.2s;">Mon-Fri</button>
+      <button id="day-sat" class="day-button" data-day="saturday" style="background:#2a2a2a;border:2px solid #666;color:#aaa;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:14px;transition:all 0.2s;">Saturday</button>
+      <button id="day-sun" class="day-button" data-day="sunday" style="background:#2a2a2a;border:2px solid #666;color:#aaa;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:14px;transition:all 0.2s;">Sunday</button>
+    </div>
   </div>
   <div id="selector" class="grid"></div>
 
@@ -196,7 +201,9 @@
     document.addEventListener('DOMContentLoaded', () => {
       const selector = document.getElementById('selector');
       const colors = document.querySelectorAll('.color-button');
+      const dayButtons = document.querySelectorAll('.day-button');
       let selectedColor = 'color-2';
+      let selectedDay = 'weekday';
       let mouseDown = false;
 
       document.body.onmousedown = () => mouseDown = true;
@@ -207,6 +214,21 @@
           colors.forEach(b => b.classList.remove('active'));
           button.classList.add('active');
           selectedColor = button.dataset.color;
+        });
+      });
+
+      dayButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          dayButtons.forEach(b => {
+            b.classList.remove('active');
+            b.style.borderColor = '#666';
+            b.style.color = '#aaa';
+          });
+          button.classList.add('active');
+          button.style.borderColor = '#4da6ff';
+          button.style.color = '#ccc';
+          selectedDay = button.dataset.day;
+          updateTotal();
         });
       });
 
@@ -289,17 +311,27 @@
         blocks.forEach((block, idx) => {
           const hourIndex = idx;
           
-          // All paid blocks get time multipliers based on time period
+          // All paid blocks get time multipliers based on time period and selected day
           if (block.classList.contains('color-2') || block.classList.contains('color-3') || block.classList.contains('color-4') || block.classList.contains('color-5')) {
-            if (hourIndex >= 62 && hourIndex <= 95) {
-              // 15:30-00:00 is time and a half (includes 22:00-23:59)
-              timeHalf++;
-            } else if (hourIndex >= 0 && hourIndex < 30) {
-              // 00:00-07:30 is double time
+            if (selectedDay === 'weekday') {
+              // Mon-Fri: Standard 07:30-15:30, Time&Half 15:30-00:00, Double 00:00-07:30
+              if (hourIndex >= 62 && hourIndex <= 95) {
+                timeHalf++;
+              } else if (hourIndex >= 0 && hourIndex < 30) {
+                double++;
+              } else {
+                std++;
+              }
+            } else if (selectedDay === 'saturday') {
+              // Saturday: Time&Half all day except Double 00:00-07:30
+              if (hourIndex >= 0 && hourIndex < 30) {
+                double++;
+              } else {
+                timeHalf++;
+              }
+            } else if (selectedDay === 'sunday') {
+              // Sunday: Double time all day
               double++;
-            } else {
-              // 07:30-15:30 is standard time
-              std++;
             }
           }
           
