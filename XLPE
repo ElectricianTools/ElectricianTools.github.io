@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<!-- XLPE Cable Calculator - Version 1 -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XLPE Cable Calculator</title>
+  <style>
+    :root { --fg:#0f0; --bg:#000; --pass:#00ff6a; --fail:#ff0000; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:monospace; background:var(--bg); color:var(--fg); overflow-x:hidden; }
+    
+    .container { width:calc(100vw - 20px); max-width:480px; margin:0 auto; padding:10px; }
+    
+    h1 { font-size:1.2rem; text-align:center; margin:0.5rem 0; }
+    
+    .results-top { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0.5rem; margin:0.5rem 0 0.5rem 0; }
+    
+    .result-item { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0.8rem; border:2px solid; height:80px; }
+    .result-item.pass { background:var(--pass); color:#000; border-color:var(--pass); }
+    .result-item.fail { background:var(--fail); color:#000; border-color:var(--fail); }
+    .result-item.warning { background:#ffff00; color:#000; border-color:#ffff00; }
+    .result-item.empty { background:transparent; border-color:var(--fg); }
+    
+    .result-label { font-size:0.75rem; font-weight:bold; opacity:0.8; text-transform:uppercase; }
+    .result-value { font-size:1.6rem; font-weight:bold; margin-top:0.3rem; }
+    .result-unit { font-size:0.8rem; margin-top:0.2rem; opacity:0.9; }
+    
+    .inputs-section { border:1px solid var(--fg); padding:0.5rem; margin:0.5rem 0; }
+    .inputs-section h2 { font-size:0.9rem; margin-bottom:0.4rem; text-transform:uppercase; }
+    
+    .inputs-row { display:flex; gap:0.5rem; margin-bottom:0.4rem; flex-wrap:wrap; }
+    .input-group { display:flex; flex-direction:column; gap:0.2rem; }
+    .input-label { font-size:0.7rem; text-transform:uppercase; }
+    
+    input, select { background:var(--bg); color:var(--fg); border:1px solid var(--fg); font-family:monospace; padding:0.4rem; font-size:0.8rem; height:2.3em; line-height:1.2; }
+    input[type="number"] { width:10ch; }
+    input:focus, select:focus { outline:none; border-color:var(--pass); box-shadow:0 0 0 1px var(--pass); }
+    select option:disabled { color:#666; }
+    
+    .checkbox-group { display:flex; gap:0.3rem; align-items:center; }
+    input[type="checkbox"] { width:1.2em; height:1.2em; cursor:pointer; appearance:none; background:var(--bg); border:1px solid var(--fg); }
+    input[type="checkbox"]:checked { background:var(--pass); border-color:var(--pass); }
+    
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    
+    .detail-box { border:1px solid var(--fg); padding:0.4rem; margin:0.5rem 0; background:var(--bg); }
+    .detail-text { font-size:0.75rem; line-height:1.5; white-space:pre-wrap; word-break:break-word; color:var(--fg); }
+    
+    details summary { cursor:pointer; font-weight:bold; color:var(--fg); user-select:none; }
+    table { width:100%; border-collapse:collapse; font-size:0.7rem; }
+    th, td { border:1px solid var(--fg); padding:0.3rem; text-align:center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="text-align:center; margin:0.5rem 0;">
+      <select id="cableType" style="width:100%; font-size:1.2rem; font-weight:bold; padding:0.5rem; border:1px solid var(--fg); background:var(--bg); color:var(--fg); font-family:monospace; box-sizing:border-box;">
+        <option value="xlpe">90° Thermosetting SWA XLPE</option>
+      </select>
+    </div>
+    
+    <div class="results-top">
+      <div id="effectiveBox" class="result-item empty">
+        <div class="result-label">Effective</div>
+        <div class="result-value" id="effectiveVal">-</div>
+        <div class="result-unit">Amperes</div>
+      </div>
+      <div id="vdropBox" class="result-item empty">
+        <div class="result-label">Volt Drop</div>
+        <div class="result-value" id="vdropVal">-</div>
+        <div class="result-unit">(5% max)</div>
+      </div>
+      <div id="zsBox" class="result-item empty">
+        <div class="result-label">Zs</div>
+        <div class="result-value" id="zsVal">-</div>
+        <div class="result-unit" id="zsUnit">Ω</div>
+      </div>
+      <div id="earthStatusBox" class="result-item warning">
+        <div class="result-label">CPC Size</div>
+        <div class="result-value" id="earthStatus">-</div>
+        <div class="result-unit">mm²</div>
+      </div>
+    </div>
+
+    <div class="inputs-section">
+      <h2>Input Parameters</h2>
+      <div class="inputs-row">
+        <div class="input-group"><label class="input-label">Method</label><select id="refMethod"><option value="C">Clipped (C)</option><option value="E" selected>Free Air (E)</option><option value="D">Ground (D)</option></select></div>
+        <div class="input-group"><label class="input-label">Current Ib (A)</label><input type="number" id="current" value="100" max="1000" /></div>
+        <div class="input-group"><label class="input-label">Voltage (V)</label><select id="voltage"><option value="230">230</option><option value="400" selected>400</option></select></div>
+        <div class="input-group"><label class="input-label">Distance (m)</label><input type="number" id="distance" value="50" max="999" /></div>
+      </div>
+      <div class="inputs-row">
+        <div class="input-group"><label class="input-label">Cable (mm²)</label><select id="cableSize"><option value="1.5">1.5</option><option value="2.5">2.5</option><option value="4">4</option><option value="6">6</option><option value="10">10</option><option value="16">16</option><option value="25" selected>25</option><option value="35">35</option><option value="50">50</option><option value="70">70</option><option value="95">95</option><option value="120">120</option><option value="150">150</option><option value="185">185</option><option value="240">240</option><option value="300">300</option><option value="400">400</option></select></div>
+        <div class="input-group"><label class="input-label">Ambient (°C)</label><input type="number" id="ambientTemp" value="30" max="100" step="1" /></div>
+        <div class="input-group"><label class="input-label">Load Type</label><select id="loadType"><option value="zdist">DISTRIBUTION</option><option value="motor">MOTOR</option><option value="heating">HEATING</option></select></div>
+        <div class="input-group"><label class="input-label">P.Factor</label><input type="number" id="powerFactor" value="1" min="0.5" max="1" step="0.01" /></div>
+      </div>
+      <div class="inputs-row">
+        <div class="input-group"><label class="input-label">Ze (Ω)</label><input type="number" id="ze" value="0.10" max="5" step="0.001" /></div>
+        <div class="input-group"><label class="input-label">Max Zs (Ω)</label><input type="number" id="maxZs" value="0.35" max="5" step="0.001" /></div>
+        <div class="checkbox-group" style="padding-top:1.8em;"><input type="checkbox" id="derate70" checked /><label class="input-label" for="derate70">70°C Derated</label></div>
+        <div class="checkbox-group" style="padding-top:1.8em;"><input type="checkbox" id="separateEarth" /><label class="input-label" for="separateEarth">Separate Earth</label></div>
+      </div>
+    </div>
+
+    <select id="earthSize" style="display:none;"><option value="1.5">1.5</option><option value="2.5">2.5</option><option value="4">4</option><option value="6">6</option><option value="10">10</option><option value="16" selected>16</option><option value="25">25</option><option value="35">35</option><option value="50">50</option><option value="70">70</option><option value="95">95</option><option value="120">120</option><option value="150">150</option><option value="185">185</option><option value="240">240</option><option value="300">300</option><option value="400">400</option></select>
+    <select id="disconnectTime" style="display:none;"><option value="0.4">0.4 sec</option><option value="5" selected>5 sec</option></select>
+
+    <div class="detail-box"><details><summary>CALCULATION DETAILS</summary><div id="calcDetail" class="detail-text" style="margin-top:0.5rem;">-</div></details></div>
+
+    <div class="detail-box"><details><summary>CURRENT CARRYING CAPACITY</summary><div style="margin-top:0.5rem; overflow-x:auto;"><table><thead><tr><th>Size (mm²)</th><th>C1PH</th><th>C3PH</th><th>E1PH</th><th>E3PH</th><th>D1PH</th><th>D3PH</th></tr></thead><tbody id="capacityTable"></tbody></table></div></details></div>
+
+    <div class="detail-box"><details><summary>VOLTAGE DROP & IMPEDANCE (mV/A/m)</summary><div style="margin-top:0.5rem; overflow-x:auto;"><table><thead><tr><th>Size (mm²)</th><th colspan="3">1-Phase</th><th colspan="3">3-Phase</th></tr><tr><th></th><th id="col1h1">Z</th><th id="col1h2">Z</th><th id="col1h3">Z</th><th id="col3h1">Z</th><th id="col3h2">Z</th><th id="col3h3">Z</th></tr></thead><tbody id="vdropTable"></tbody></table></div></details></div>
+
+    <div class="detail-box"><details><summary>EARTH CONDUCTOR RESISTANCE (mΩ/m)</summary><div style="margin-top:0.5rem; overflow-x:auto;"><table><thead><tr><th>Size (mm²)</th><th>Resistance (mΩ/m)</th></tr></thead><tbody id="earthResistanceTable"></tbody></table></div></details></div>
+  </div>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const tempFactors = {25:1.02, 30:1.00, 35:0.96, 40:0.91, 45:0.87, 50:0.82, 55:0.76, 60:0.71, 65:0.65, 70:0.58, 75:0.50, 80:0.41};
+    const data = {"1.5":{C:23,E:25,D:21,C1ph:27,E1ph:29,D1ph:25,vd1ph:29,vd3ph:25,z1ph:31,z3ph:27,r1ph:1.6,x1ph:0.14},"2.5":{C:31,E:33,D:28,C1ph:36,E1ph:39,D1ph:33,vd1ph:18,vd3ph:15,z1ph:19,z3ph:16,r1ph:1.6,x1ph:0.14},"4":{C:42,E:44,D:36,C1ph:49,E1ph:52,D1ph:43,vd1ph:11,vd3ph:9.5,z1ph:12,z3ph:10,r1ph:1.6,x1ph:0.14},"6":{C:53,E:56,D:44,C1ph:62,E1ph:66,D1ph:53,vd1ph:7.3,vd3ph:6.4,z1ph:7.9,z3ph:6.8,r1ph:1.6,x1ph:0.14},"10":{C:73,E:78,D:58,C1ph:85,E1ph:90,D1ph:71,vd1ph:4.4,vd3ph:3.8,z1ph:4.7,z3ph:4.0,r1ph:1.6,x1ph:0.14},"16":{C:94,E:99,D:75,C1ph:110,E1ph:115,D1ph:91,vd1ph:2.8,vd3ph:2.4,z1ph:2.9,z3ph:2.5,r1ph:1.6,x1ph:0.14},"25":{C:124,E:131,D:96,C1ph:146,E1ph:152,D1ph:116,vd1ph:1.75,vd3ph:1.50,z1ph:1.9,z3ph:1.65,r1ph:1.85,x1ph:0.16,r3ph:1.60,x3ph:0.14},"35":{C:154,E:162,D:115,C1ph:180,E1ph:188,D1ph:139,vd1ph:1.25,vd3ph:1.10,z1ph:1.35,z3ph:1.15,r1ph:1.35,x1ph:0.155,r3ph:1.15,x3ph:0.135},"50":{C:187,E:197,D:135,C1ph:219,E1ph:228,D1ph:164,vd1ph:0.93,vd3ph:0.81,z1ph:1.00,z3ph:0.87,r1ph:0.99,x1ph:0.155,r3ph:0.86,x3ph:0.135},"70":{C:238,E:251,D:167,C1ph:279,E1ph:291,D1ph:203,vd1ph:0.63,vd3ph:0.57,z1ph:0.69,z3ph:0.60,r1ph:0.67,x1ph:0.15,r3ph:0.59,x3ph:0.13},"95":{C:289,E:304,D:197,C1ph:338,E1ph:354,D1ph:239,vd1ph:0.47,vd3ph:0.43,z1ph:0.52,z3ph:0.45,r1ph:0.5,x1ph:0.15,r3ph:0.43,x3ph:0.13},"120":{C:335,E:353,D:223,C1ph:392,E1ph:410,D1ph:271,vd1ph:0.38,vd3ph:0.35,z1ph:0.42,z3ph:0.37,r1ph:0.4,x1ph:0.145,r3ph:0.34,x3ph:0.13},"150":{C:386,E:406,D:251,C1ph:451,E1ph:472,D1ph:306,vd1ph:0.30,vd3ph:0.29,z1ph:0.35,z3ph:0.30,r1ph:0.32,x1ph:0.145,r3ph:0.28,x3ph:0.125},"185":{C:441,E:463,D:324,C1ph:515,E1ph:539,D1ph:395,vd1ph:0.25,vd3ph:0.25,z1ph:0.29,z3ph:0.26,r1ph:0.26,x1ph:0.145,r3ph:0.22,x3ph:0.125},"240":{C:520,E:546,D:324,C1ph:607,E1ph:636,D1ph:395,vd1ph:0.190,vd3ph:0.185,z1ph:0.24,z3ph:0.21,r1ph:0.2,x1ph:0.14,r3ph:0.175,x3ph:0.125},"300":{C:599,E:628,D:365,C1ph:698,E1ph:732,D1ph:446,vd1ph:0.155,vd3ph:0.160,z1ph:0.21,z3ph:0.185,r1ph:0.16,x1ph:0.14,r3ph:0.14,x3ph:0.12},"400":{C:673,E:728,C1ph:787,E1ph:847,vd1ph:0.115,vd3ph:0.160,z1ph:0.19,z3ph:0.165,r1ph:0.13,x1ph:0.14,r3ph:0.115,x3ph:0.12}};
+    const cableSizes = ['1.5', '2.5', '4', '6', '10', '16', '25', '35', '50', '70', '95', '120', '150', '185', '240', '300', '400'];
+
+    function getTempFactor(t) { return tempFactors[t] || tempFactors[30]; }
+    function updateCableSizeOptions() { const m = $('#refMethod').value; const opt = document.querySelector('option[value="400"]'); if (m === 'D') { opt.disabled = true; if ($('#cableSize').value === '400') $('#cableSize').value = '300'; } else opt.disabled = false; }
+    function updateLoadTypeOptions() { const sz = $('#cableSize').value; const small = ['1.5','2.5','4','6','10','16']; const h = document.querySelector('option[value="heating"]'); const m = document.querySelector('option[value="motor"]'); const l = $('#loadType'); if (small.includes(sz)) { h.disabled = m.disabled = true; if (['heating','motor'].includes(l.value)) l.value = 'zdist'; } else h.disabled = m.disabled = false; }
+    function buildCapacityTable() { const t = $('#capacityTable'); t.innerHTML = ''; cableSizes.forEach(s => { const d = data[s]; if (!d) return; t.innerHTML += `<tr><td>${s}</td><td>${d.C1ph||'-'}</td><td>${d.C||'-'}</td><td>${d.E1ph||'-'}</td><td>${d.E||'-'}</td><td>${d.D1ph||'-'}</td><td>${d.D||'-'}</td></tr>`; }); }
+    function buildVdropTable() { const t = $('#vdropTable'); t.innerHTML = ''; const small = ['1.5','2.5','4','6','10','16']; cableSizes.forEach(s => { const d = data[s]; if (!d) return; let r; if (small.includes(s)) { const z1 = d.z1ph||d.vd1ph; const z3 = d.z3ph||d.vd3ph; r = `<tr><td>${s}</td><td>-</td><td>-</td><td>${z1}</td><td>-</td><td>-</td><td>${z3}</td></tr>`; } else { r = `<tr><td>${s}</td><td>${d.r1ph||'-'}</td><td>${d.x1ph||'-'}</td><td>${d.z1ph||'-'}</td><td>${d.r3ph||'-'}</td><td>${d.x3ph||'-'}</td><td>${d.z3ph||'-'}</td></tr>`; } t.innerHTML += r; }); }
+    function buildEarthResistanceTable() { const t = $('#earthResistanceTable'); t.innerHTML = ''; cableSizes.forEach(s => { const d = data[s]; if (!d) return; const r = d.r3ph !== undefined ? d.r3ph : (d.r1ph || '-'); t.innerHTML += `<tr><td>${s}</td><td>${r}</td></tr>`; }); }
+    function calcEarthConductor() { const s = $('#cableSize').value; const e = $('#earthSize').value; const u = parseFloat($('#voltage').value) || 400; const z = parseFloat($('#ze').value) || 0.1; const m = parseFloat($('#maxZs').value) || 0.35; const l = parseFloat($('#distance').value) || 0; const c = data[s]; const ec = data[e]; if (!c || !ec) { $('#earthStatus').textContent = '-'; $('#earthStatusBox').className = 'result-item warning'; return; } const pn = parseFloat(s); let cm = null; if (pn <= 16) cm = s; else if (pn <= 35) cm = '16'; else cm = cableSizes.find(x => parseFloat(x) >= pn*0.5) || s; const r3 = c.r3ph !== undefined ? c.r3ph : (c.r1ph || 0); const er = ec.r3ph !== undefined ? ec.r3ph : (ec.r1ph || 0); const cz = r3 * l / 1000; const ez = er * l / 1000; const tz = z + cz + ez; const ci = cableSizes.indexOf(cm); const si = cableSizes.indexOf(e); let st = '✓ CORRECT', sc = 'warning'; if (si < ci) { st = '✗ TOO SMALL'; sc = 'fail'; } else if (tz > m) { st = '✗ Zs HIGH'; sc = 'fail'; } const se = $('#separateEarth').checked; const ds = se ? cm : s; $('#earthStatus').textContent = ds + 'mm²'; $('#earthStatusBox').className = 'result-item warning'; return { fault: u / (1.732 * z), cmin: cm, earth: e, earthr: er, czc: cz, ezc: ez, tz: tz, mz: m, ze: z, sz: s }; }
+    function calc() { const i = parseFloat($('#current').value) || 0; const u = parseFloat($('#voltage').value) || 400; const l = parseFloat($('#distance').value) || 0; const s = $('#cableSize').value; const t = parseFloat($('#ambientTemp').value) || 30; const d70 = $('#derate70').checked; const se = $('#separateEarth').checked; const k = se ? 176 : 143; const z = parseFloat($('#ze').value) || 0.1; const m = parseFloat($('#maxZs').value) || 0.35; const lt = $('#loadType').value; const pf = parseFloat($('#powerFactor').value) || 1; const mt = $('#refMethod').value; const es = $('#earthSize').value; const c = data[s]; const ec = data[es]; ['#effectiveBox', '#vdropBox', '#zsBox'].forEach(e => $(e).className = 'result-item empty'); $('#earthStatusBox').className = 'result-item warning'; if (!c || !c[mt]) { $('#effectiveVal').textContent = '-'; $('#vdropVal').textContent = '-'; $('#zsVal').textContent = '-'; $('#calcDetail').textContent = '-'; calcEarthConductor(); return; } let df = 1; const tf = getTempFactor(t); df *= tf; const drf = ['' + tf]; if (d70) { df *= 0.87; drf.push('×0.87'); } const br = c[mt]; const er = br * df; $('#effectiveVal').textContent = er.toFixed(1); let vr = 'N/A', zr = 'N/A', vp = 0, zs = 0; let ct = ''; const ed = calcEarthConductor(); ct = `DERATING FACTOR:\nTemperature: ${t}°C = ${tf.toFixed(4)}\n${drf.join(' ')} = ${df.toFixed(4)}\nEffective Rating = ${br}A × ${df.toFixed(4)} = ${er.toFixed(1)}A\nK Factor = ${k} (${se ? 'Separate Earth' : 'Incorporated Earth'})\n\n`; if (c.z3ph && l > 0 && i > 0) { const z3 = c.z3ph || 0; const vm = z3 * l * i; const vv = vm / 1000; vp = u > 0 ? vv / u * 100 : 0; vr = vp.toFixed(2) + '%'; ct += `VOLTAGE DROP:\nVD = mV/A/m × L × Ib / 1000\nVD = ${z3} × ${l} × ${i} / 1000 = ${vm.toFixed(0)}mV / 1000 = ${vv.toFixed(2)}V\nVD% = ${vv.toFixed(2)}V / ${u}V × 100\nVD% = ${vp.toFixed(2)}% (Max 5%)\n\n`; let cz = 0; let r3 = 0; let x3 = 0; let er2 = ed.earthr || 0; let tr = 0; if (lt === 'motor') { r3 = c.r3ph !== undefined ? c.r3ph : (c.r || 0); x3 = c.x3ph !== undefined ? c.x3ph : (c.x || 0); tr = r3 + er2; cz = Math.sqrt((tr*tr) + (x3*x3)) * l / 1000; } else if (lt === 'heating') { r3 = c.r3ph !== undefined ? c.r3ph : (c.r || 0); tr = r3 + er2; cz = tr * l / 1000; } else { r3 = c.r3ph !== undefined ? c.r3ph : 0; tr = r3 + er2; cz = tr * l / 1000; } zs = z + cz; zr = zs.toFixed(2) + 'Ω'; const trf = tr.toFixed(2); ct += `EARTH FAULT LOOP IMPEDANCE (${lt.toUpperCase()}):\nPhase (${ed.sz}mm²) = ${r3}mΩ/m, Earth (${ed.earth}mm²) = ${er2}mΩ/m\nR1R2 = ${r3 || 0} + ${er2} = ${trf}mΩ/m\n`; if (lt === 'motor') { const x3f = x3.toFixed(3); const iv = Math.sqrt((tr*tr) + (x3*x3)).toFixed(2); ct += `Z1Z2 = √(R² + X²)\nZ1Z2 = √(${trf}² + ${x3f}²)\nZ1Z2 = √(${(tr*tr).toFixed(0)} + ${(x3*x3).toFixed(2)})\nZ1Z2 = ${iv}mΩ/m\nZ1Z2 = ${iv} × ${l} / 1000\n`; } else { ct += `R1R2 = mΩ/m × m / 1000\nR1R2 = ${trf} × ${l} / 1000\n`; } ct += `Z = ${cz.toFixed(2)}Ω\nZs = Ze + Z\nZs = ${parseFloat(z).toFixed(3)} + ${cz.toFixed(2)}\nZs = ${zs.toFixed(2)}Ω (Max ${m.toFixed(3)}Ω)\n\n`; if (ed) { ct += `PROSPECTIVE FAULT CURRENT:\nIflt = U / (√3 × Ze)\nIflt = ${u} / (1.732 × ${parseFloat(z).toFixed(3)})\nIflt = ${ed.fault.toFixed(0)}A\n\n`; const pn = parseFloat(ed.sz); let ca = ''; if (pn <= 16) ca = 'rule1'; else if (pn <= 35) ca = 'rule2'; else ca = 'rule3'; ct += `PROTECTIVE CONDUCTOR (CPC) SIZING:\nS ≤ 16: CPC = S ${ca === 'rule1' ? '← APPLIES' : ''}\n16 < S ≤ 35: CPC = 16mm² ${ca === 'rule2' ? '← APPLIES' : ''}\nS > 35: CPC = S/2 ${ca === 'rule3' ? '← APPLIES' : ''}\nMinimum CPC size: ${ed.cmin}mm² (BS 7671)\n\n`; } } else if (l === 0) { ct = 'Enter distance to calculate impedance'; calcEarthConductor(); } else if (!c.z3ph) { ct = 'Cable size not supported for detailed calculations'; } $('#vdropVal').textContent = vr; $('#zsVal').textContent = zr; $('#zsUnit').textContent = `(${m.toFixed(3)}Ω)`; $('#calcDetail').textContent = ct; const es1 = er >= i; const vp1 = vp <= 5; const zs1 = zs <= m; $('#effectiveBox').className = 'result-item ' + (es1 ? 'pass' : 'fail'); $('#vdropBox').className = 'result-item ' + (vp1 ? 'pass' : 'fail'); $('#zsBox').className = 'result-item ' + (zs1 ? 'pass' : 'fail'); }
+    function highlightSelectedCable() { const s = $('#cableSize').value; const m = $('#refMethod').value; const lt = $('#loadType').value; document.querySelectorAll('#capacityTable td, #vdropTable td, #earthResistanceTable td').forEach(c => { c.style.backgroundColor = ''; c.style.color = ''; }); const cr = document.querySelectorAll('#capacityTable tr'); cr.forEach(r => { const cs = r.querySelectorAll('td'); if (cs[0] && cs[0].textContent === s) { let ci = -1; if (m === 'C') ci = 2; else if (m === 'E') ci = 4; else if (m === 'D') ci = 6; if (ci > -1 && cs[ci]) { cs[ci].style.backgroundColor = 'var(--pass)'; cs[ci].style.color = '#000'; } } }); const vr = document.querySelectorAll('#vdropTable tr'); vr.forEach(r => { const cs = r.querySelectorAll('td'); if (cs[0] && cs[0].textContent === s) { if (lt === 'motor') { if (cs[4]) { cs[4].style.backgroundColor = 'var(--pass)'; cs[4].style.color = '#000'; } if (cs[5]) { cs[5].style.backgroundColor = 'var(--pass)'; cs[5].style.color = '#000'; } } else if (lt === 'heating') { if (cs[4]) { cs[4].style.backgroundColor = 'var(--pass)'; cs[4].style.color = '#000'; } } else { if (cs[6]) { cs[6].style.backgroundColor = 'var(--pass)'; cs[6].style.color = '#000'; } } } }); const er = document.querySelectorAll('#earthResistanceTable tr'); er.forEach(r => { const cs = r.querySelectorAll('td'); if (cs[0] && cs[0].textContent === s) { if (cs[1]) { cs[1].style.backgroundColor = 'var(--pass)'; cs[1].style.color = '#000'; } } }); }
+    function updateEarthSizeToMatch() { const se = $('#separateEarth').checked; const ess = $('#earthSize'); const cs = $('#cableSize').value; const pn = parseFloat(cs); if (!se) ess.value = cs; else { let cpc = null; if (pn <= 16) cpc = cs; else if (pn <= 35) cpc = '16'; else cpc = cableSizes.find(x => parseFloat(x) >= pn*0.5) || cs; ess.value = cpc; } }
+
+    $('#refMethod').addEventListener('change', () => { updateCableSizeOptions(); calc(); highlightSelectedCable(); });
+    $('#cableSize').addEventListener('change', () => { updateLoadTypeOptions(); updateEarthSizeToMatch(); calc(); highlightSelectedCable(); });
+    $('#separateEarth').addEventListener('change', () => { updateEarthSizeToMatch(); calc(); highlightSelectedCable(); });
+    ['current', 'voltage', 'distance', 'ambientTemp', 'derate70', 'loadType', 'ze', 'maxZs', 'powerFactor', 'disconnectTime', 'separateEarth'].forEach(id => { const el = $(`#${id}`); if (el) { el.addEventListener('change', () => { calc(); highlightSelectedCable(); }); el.addEventListener('input', () => { calc(); highlightSelectedCable(); }); } });
+    $('#distance').addEventListener('input', () => { if (parseFloat($('#distance').value) > 999) { $('#distance').value = 999; calc(); highlightSelectedCable(); } });
+    $('#current').addEventListener('input', () => { if (parseFloat($('#current').value) > 1000) { $('#current').value = 1000; calc(); highlightSelectedCable(); } });
+    $('#ambientTemp').addEventListener('input', () => { if (parseFloat($('#ambientTemp').value) > 100) { $('#ambientTemp').value = 100; calc(); highlightSelectedCable(); } });
+    $('#ze').addEventListener('input', () => { if (parseFloat($('#ze').value) > 5) { $('#ze').value = (5).toFixed(3); calc(); highlightSelectedCable(); } });
+    $('#ze').addEventListener('blur', () => { if ($('#ze').value !== '') $('#ze').value = parseFloat($('#ze').value).toFixed(3); });
+    $('#maxZs').addEventListener('input', () => { if (parseFloat($('#maxZs').value) > 5) { $('#maxZs').value = (5).toFixed(3); calc(); highlightSelectedCable(); } });
+    $('#maxZs').addEventListener('blur', () => { if ($('#maxZs').value !== '') $('#maxZs').value = parseFloat($('#maxZs').value).toFixed(3); });
+    $('#powerFactor').addEventListener('blur', () => { let v = parseFloat($('#powerFactor').value); if (v > 1) v = 1; if (v < 0.5) v = 0.5; $('#powerFactor').value = v.toFixed(2); });
+
+    updateCableSizeOptions(); updateLoadTypeOptions(); updateEarthSizeToMatch(); buildCapacityTable(); buildVdropTable(); buildEarthResistanceTable(); highlightSelectedCable(); calc();
+  </script>
+</body>
+</html>
